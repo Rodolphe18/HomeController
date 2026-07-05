@@ -4,9 +4,12 @@ import com.francotte.homecontroller.MainDispatcherRule
 import com.francotte.homecontroller.domain.model.BleDevice
 import com.francotte.homecontroller.domain.scan.BleScanException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -50,13 +53,18 @@ class ScanViewModelTest {
     }
 
     @Test
-    fun `startScan trie les appareils par RSSI decroissant`() = runTest {
+    fun `startScan publie les appareils tries par RSSI decroissant a la cadence de rafraichissement`() = runTest {
         val devices = listOf(device("AA", -80), device("BB", -40), device("CC", -60))
-        val vm = ScanViewModel(FakeBleScanner(flowOf(devices)))
+        // Flux qui émet puis reste ouvert, pour laisser un tick de sample se produire.
+        val vm = ScanViewModel(
+            FakeBleScanner(flow { emit(devices); awaitCancellation() }),
+            refreshIntervalMs = 1_000L
+        )
         vm.updateAvailability(hasPermissions = true, isBluetoothEnabled = true)
 
         vm.startScan()
-        advanceUntilIdle()
+        advanceTimeBy(1_100)
+        runCurrent()
 
         val state = vm.uiState.value
         assertTrue(state is ScanUiState.Scanning)
@@ -64,6 +72,8 @@ class ScanViewModelTest {
             listOf("BB", "CC", "AA"),
             (state as ScanUiState.Scanning).devices.map { it.address }
         )
+
+        vm.stopScan()
     }
 
     @Test

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.francotte.homecontroller.domain.scan.BleScanException
 import com.francotte.homecontroller.domain.scan.BleScanner
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,14 +12,21 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 
 /**
  * Orchestre le scan BLE et expose l'état de l'écran.
  * Aucune dépendance Android : ne connaît que l'interface [BleScanner].
+ *
+ * @param refreshIntervalMs cadence de rafraîchissement de l'UI. Le scanner émet
+ *   à chaque paquet BLE (bien trop souvent pour l'œil) ; on échantillonne à cet
+ *   intervalle pour une liste calme et lisible.
  */
+@OptIn(FlowPreview::class)
 class ScanViewModel(
-    private val scanner: BleScanner
+    private val scanner: BleScanner,
+    private val refreshIntervalMs: Long = 1_000L
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ScanUiState>(ScanUiState.PermissionRequired)
@@ -56,10 +64,12 @@ class ScanViewModel(
         if (scanJob != null) return
 
         _uiState.value = ScanUiState.Scanning(emptyList())
+        val stabilizer = RssiStabilizer()
         scanJob = viewModelScope.launch {
             scanner.scan()
-                .onEach { devices ->
-                    _uiState.value = ScanUiState.Scanning(devices.sortedByDescending { it.rssi })
+                .sample(refreshIntervalMs)
+                .onEach { snapshot ->
+                    _uiState.value = ScanUiState.Scanning(stabilizer.update(snapshot))
                 }
                 .catch { throwable ->
                     val message = when (throwable) {
