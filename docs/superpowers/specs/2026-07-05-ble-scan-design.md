@@ -15,7 +15,7 @@ C'est une fonctionnalité **100 % téléphone** : elle ne nécessite pas le mat�
 
 - Se **connecter** à un périphérique BLE.
 - Lire / écrire des caractéristiques GATT.
-- Contrôler l'Arduino (nécessitera un module BLE type HM-10 / AT-09 / HC-08 — les modules HC-05 / HC-06 sont du Bluetooth **Classic** et n'apparaîtront pas dans un scan BLE).
+- Contrôler l'Arduino (l'ESP32 possède un contrôleur Bluetooth intégré, qui supporte à la fois Bluetooth Classic et Bluetooth Low Energy (BLE))
 - Persistance des appareils, favoris, historique.
 
 ## 2. Critères de succès
