@@ -1,15 +1,7 @@
 package com.francotte.homecontroller
 
 import android.app.Application
-import com.francotte.homecontroller.di.AppContainer
+import dagger.hilt.android.HiltAndroidApp
 
-class HomeControllerApplication : Application() {
-
-    lateinit var container: AppContainer
-        private set
-
-    override fun onCreate() {
-        super.onCreate()
-        container = AppContainer(this)
-    }
-}
+@HiltAndroidApp
+class HomeControllerApplication : Application()

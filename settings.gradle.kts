@@ -24,4 +24,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "HomeController"
 include(":app")
- 
+include(":core:model")
+include(":core:testing")
+include(":core:designsystem")
+include(":core:bluetooth")
+include(":feature:scan")
+include(":feature:devicedetail")

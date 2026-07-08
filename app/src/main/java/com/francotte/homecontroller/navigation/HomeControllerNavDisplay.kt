@@ -7,8 +7,8 @@ import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDe
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.francotte.homecontroller.presentation.control.DeviceControlScreen
-import com.francotte.homecontroller.presentation.scan.ScanScreen
+import com.francotte.homecontroller.feature.devicedetail.DeviceControlScreen
+import com.francotte.homecontroller.feature.scan.ScanScreen
 
 @Composable
 fun HomeControllerNavDisplay() {

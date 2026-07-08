@@ -2,28 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Android 12+ (API 31+) : scan BLE + lecture du nom des appareils.
-         neverForLocation : on n'utilise pas le BLE pour déduire la localisation. -->
-    <uses-permission
-        android:name="android.permission.BLUETOOTH_SCAN"
-        android:usesPermissionFlags="neverForLocation" />
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-
-    <!-- Android 11 (API 30) et antérieurs : ancien modèle de permissions. -->
-    <uses-permission
-        android:name="android.permission.BLUETOOTH"
-        android:maxSdkVersion="30" />
-    <uses-permission
-        android:name="android.permission.BLUETOOTH_ADMIN"
-        android:maxSdkVersion="30" />
-    <uses-permission
-        android:name="android.permission.ACCESS_FINE_LOCATION"
-        android:maxSdkVersion="30" />
-
-    <!-- L'appareil doit disposer du BLE. -->
-    <uses-feature
-        android:name="android.hardware.bluetooth_le"
-        android:required="true" />
+    <!-- Les permissions/feature BLE sont déclarées dans le module :core:bluetooth
+         et fusionnées automatiquement. -->
 
     <application
         android:name=".HomeControllerApplication"
