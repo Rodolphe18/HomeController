@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -59,6 +60,7 @@ private fun Context.isBluetoothEnabled(): Boolean {
 
 @Composable
 fun ScanScreen(
+    onDeviceClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ScanViewModel = viewModel(factory = ScanViewModelFactory)
 ) {
@@ -120,7 +122,7 @@ fun ScanScreen(
                             Text("Recherche d'appareils…")
                         }
                     } else {
-                        DeviceList(state.devices)
+                        DeviceList(state.devices, onDeviceClick)
                     }
                 }
 
@@ -145,17 +147,21 @@ private fun ScanButton(isScanning: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-private fun DeviceList(devices: List<BleDevice>) {
+private fun DeviceList(devices: List<BleDevice>, onDeviceClick: (String) -> Unit) {
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         items(devices, key = { it.address }) { device ->
-            DeviceRow(device)
+            DeviceRow(device, onClick = { onDeviceClick(device.address) })
         }
     }
 }
 
 @Composable
-private fun DeviceRow(device: BleDevice) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+private fun DeviceRow(device: BleDevice, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+    ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(
                 text = device.name ?: "Inconnu",
