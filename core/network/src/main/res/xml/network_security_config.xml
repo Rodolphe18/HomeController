@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Autorise le trafic HTTP en clair (Home Assistant sur IP locale). -->
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- HTTP en clair autorisé : Home Assistant est joint en http sur le LAN.
+         Fusionné dans l'app via android:networkSecurityConfig ci-dessous. -->
+    <application android:networkSecurityConfig="@xml/network_security_config" />
+</manifest>

@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.francotte.homecontroller.core.designsystem.theme.HomeControllerTheme
-import com.francotte.homecontroller.navigation.HomeControllerNavDisplay
+import com.francotte.homecontroller.navigation.HomeControllerAppShell
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HomeControllerTheme {
-                HomeControllerNavDisplay()
+                HomeControllerAppShell()
             }
         }
     }
