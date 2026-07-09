@@ -26,8 +26,9 @@ class ServerCallbacks : public BLEServerCallbacks {
 
 class LedCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic* characteristic) override {
-    std::string value = characteristic->getValue();
-    if (!value.empty()) {
+    // ESP32 Arduino core 3.x : getValue() renvoie un String Arduino (plus un std::string).
+    String value = characteristic->getValue();
+    if (value.length() > 0) {
       digitalWrite(LED_PIN, value[0] == 0x01 ? HIGH : LOW);
     }
   }
