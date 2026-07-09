@@ -15,4 +15,7 @@ internal abstract class BluetoothModule {
     // non scopé → une nouvelle instance par injection (une session par écran de contrôle)
     @Binds
     abstract fun bindEspDeviceClient(impl: AndroidEspDeviceClient): EspDeviceClient
+
+    @Binds
+    abstract fun bindBtClassicScanner(impl: AndroidBtClassicScanner): BtClassicScanner
 }
