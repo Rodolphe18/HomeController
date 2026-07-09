@@ -1,0 +1,5 @@
+# Secrets (WiFi, clés) — ne jamais committer
+secrets.yaml
+
+# Artefacts de build ESPHome
+.esphome/

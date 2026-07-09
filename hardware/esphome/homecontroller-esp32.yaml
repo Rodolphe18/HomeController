@@ -1,0 +1,40 @@
+esphome:
+  name: homecontroller-esp32
+  friendly_name: HomeController ESP32
+
+esp32:
+  board: esp32dev          # ELEGOO ESP32-WROOM-32 DevKit
+
+# Logs via USB série
+logger:
+
+# API native ESPHome <-> Home Assistant (chiffrée)
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+# Mises à jour OTA (après le premier flash USB, on flashe par WiFi)
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  # Point d'accès de secours si le WiFi est injoignable au démarrage
+  ap:
+    ssid: "HomeController-ESP32"
+    password: !secret fallback_password
+
+captive_portal:
+
+# LED embarquée (GPIO2) pilotée en PWM -> lumière dimmable, exposée à HA
+output:
+  - platform: ledc
+    pin: GPIO2
+    id: onboard_led_output
+
+light:
+  - platform: monochromatic
+    name: "LED embarquée"
+    output: onboard_led_output
