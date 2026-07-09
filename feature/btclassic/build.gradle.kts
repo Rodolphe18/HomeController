@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.francotte.homecontroller.feature.homeassistant"
+    namespace = "com.francotte.homecontroller.feature.btclassic"
     compileSdk { version = release(37) }
     defaultConfig { minSdk = 26 }
     compileOptions {
@@ -18,9 +18,7 @@ android {
 
 dependencies {
     implementation(project(":core:model"))
-    implementation(project(":core:domain"))
-    implementation(project(":core:data"))
-    implementation(project(":core:designsystem"))
+    implementation(project(":core:bluetooth"))
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.material3)

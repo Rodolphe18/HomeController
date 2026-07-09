@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,9 +26,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.francotte.homecontroller.core.designsystem.AppIcons
 import com.francotte.homecontroller.core.model.HomeAssistantEntity
 
 @Composable
@@ -114,7 +114,7 @@ private fun EntitiesContent(
     ) {
         Text("Mes appareils", style = MaterialTheme.typography.titleMedium)
         IconButton(onClick = onEditConfig) {
-            Icon(Icons.Filled.Settings, contentDescription = "Configuration")
+            Icon(painterResource(AppIcons.Settings), contentDescription = "Configuration")
         }
     }
     state.transientError?.let { Text(it, color = MaterialTheme.colorScheme.error) }

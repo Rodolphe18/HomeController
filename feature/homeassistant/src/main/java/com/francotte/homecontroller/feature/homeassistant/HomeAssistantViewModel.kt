@@ -76,7 +76,10 @@ class HomeAssistantViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 setEntityState(entityId, on)
-                loadEntities()   // réconcilie avec l'état réel
+                // Pas de rechargement immédiat : les appareils Tapo passent par le cloud et
+                // mettent un délai à refléter le nouvel état. Un GET /states immédiat renverrait
+                // l'ancien état et ferait "sauter" le toggle. L'état optimiste est conservé ;
+                // le pull-to-refresh réconcilie à la demande.
             } catch (t: Throwable) {
                 val reverted = _uiState.value as? HomeAssistantUiState.Entities ?: return@launch
                 _uiState.value = reverted.copy(

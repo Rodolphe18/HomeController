@@ -1,9 +1,7 @@
 package com.francotte.homecontroller.navigation
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -17,18 +15,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.francotte.homecontroller.core.designsystem.AppIcons
+import com.francotte.homecontroller.feature.btclassic.BtClassicScanScreen
 import com.francotte.homecontroller.feature.devicedetail.DeviceControlScreen
 import com.francotte.homecontroller.feature.homeassistant.HomeAssistantScreen
 import com.francotte.homecontroller.feature.scan.ScanScreen
 
-private enum class TopTab(val label: String, val icon: ImageVector) {
-    HomeAssistant("Home Assistant", Icons.Filled.Home),
-    BluetoothDirect("Bluetooth", Icons.Filled.Search)
+private enum class TopTab(val label: String, @DrawableRes val icon: Int) {
+    HomeAssistant("Home Assistant", AppIcons.HomeAssistant),
+    Ble("BLE", AppIcons.Ble),
+    BtClassic("Bluetooth Classic", AppIcons.BtClassic)
 }
 
 @Composable
@@ -38,9 +39,11 @@ fun HomeControllerAppShell() {
     // Un back stack mémorisé par onglet ; la position de navigation persiste au changement d'onglet.
     val haBackStack = remember { mutableStateListOf<NavKey>(HomeAssistantKey) }
     val bleBackStack = remember { mutableStateListOf<NavKey>(ScanKey) }
+    val classicBackStack = remember { mutableStateListOf<NavKey>(BtClassicKey) }
     val backStack = when (selected) {
         TopTab.HomeAssistant -> haBackStack
-        TopTab.BluetoothDirect -> bleBackStack
+        TopTab.Ble -> bleBackStack
+        TopTab.BtClassic -> classicBackStack
     }
 
     Scaffold(
@@ -50,7 +53,7 @@ fun HomeControllerAppShell() {
                     NavigationBarItem(
                         selected = selected == tab,
                         onClick = { selected = tab },
-                        icon = { Icon(tab.icon, contentDescription = tab.label) },
+                        icon = { Icon(painterResource(tab.icon), contentDescription = tab.label) },
                         label = { Text(tab.label) }
                     )
                 }
@@ -74,6 +77,9 @@ fun HomeControllerAppShell() {
                         address = key.address,
                         onBack = { bleBackStack.removeLastOrNull() }
                     )
+                }
+                entry<BtClassicKey> {
+                    BtClassicScanScreen()
                 }
             }
         )

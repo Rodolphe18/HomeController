@@ -43,7 +43,14 @@ import com.francotte.homecontroller.core.model.BleDevice
 /** Permissions runtime à demander, selon la version Android. */
 private fun requiredScanPermissions(): Array<String> =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT)
+        // Sans neverForLocation, la découverte n'aboutit que si la localisation est accordée.
+        // Sur Android 12+, FINE doit être demandée avec COARSE, sinon le système l'ignore.
+        arrayOf(
+            Manifest.permission.BLUETOOTH_SCAN,
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
     } else {
         arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
     }

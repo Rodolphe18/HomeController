@@ -3,7 +3,9 @@ package com.francotte.homecontroller.core.data
 import com.francotte.homecontroller.core.datastore.HomeAssistantConfigStore
 import com.francotte.homecontroller.core.model.HomeAssistantConfig
 import com.francotte.homecontroller.core.model.HomeAssistantException
+import com.francotte.homecontroller.core.network.EntityRegistryEntry
 import com.francotte.homecontroller.core.network.HomeAssistantNetworkDataSource
+import com.francotte.homecontroller.core.network.HomeAssistantWebSocketDataSource
 import com.francotte.homecontroller.core.network.NetworkAttributes
 import com.francotte.homecontroller.core.network.NetworkEntityState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,8 +37,18 @@ class DefaultHomeAssistantRepositoryTest {
         }
     }
 
-    private fun repo(ds: FakeDataSource = FakeDataSource(), store: FakeStore = FakeStore()) =
-        DefaultHomeAssistantRepository(ds, store)
+    private class FakeWebSocketDataSource : HomeAssistantWebSocketDataSource {
+        var registry: List<EntityRegistryEntry> = emptyList()
+        var error: Throwable? = null
+        override suspend fun getEntityRegistry(): List<EntityRegistryEntry> =
+            error?.let { throw it } ?: registry
+    }
+
+    private fun repo(
+        ds: FakeDataSource = FakeDataSource(),
+        ws: FakeWebSocketDataSource = FakeWebSocketDataSource(),
+        store: FakeStore = FakeStore()
+    ) = DefaultHomeAssistantRepository(ds, ws, store)
 
     @Test
     fun `getControllableEntities filtre light et switch et mappe`() = runTest {
@@ -57,6 +69,41 @@ class DefaultHomeAssistantRepositoryTest {
         assertEquals("switch.prise", prise.friendlyName)  // repli sur entityId
         assertFalse(prise.isOn)
         assertEquals("switch", prise.domain)
+    }
+
+    @Test
+    fun `getControllableEntities masque les entites auxiliaires (entity_category non nul)`() = runTest {
+        val ds = FakeDataSource().apply {
+            states = listOf(
+                NetworkEntityState("switch.tapo_p110", "off", NetworkAttributes("Tapo P110")),
+                NetworkEntityState("switch.tapo_p110_led", "off", NetworkAttributes("Tapo P110 LED")),
+                NetworkEntityState("light.tapo_l535", "on", NetworkAttributes("Tapo L535"))
+            )
+        }
+        val ws = FakeWebSocketDataSource().apply {
+            registry = listOf(
+                EntityRegistryEntry("switch.tapo_p110", entityCategory = null),
+                EntityRegistryEntry("switch.tapo_p110_led", entityCategory = "config"),
+                EntityRegistryEntry("light.tapo_l535", entityCategory = null)
+            )
+        }
+        val result = repo(ds, ws).getControllableEntities()
+
+        assertEquals(listOf("switch.tapo_p110", "light.tapo_l535"), result.map { it.entityId })
+    }
+
+    @Test
+    fun `si le registre WebSocket echoue on ne filtre pas (degradation gracieuse)`() = runTest {
+        val ds = FakeDataSource().apply {
+            states = listOf(
+                NetworkEntityState("switch.tapo_p110", "off", NetworkAttributes("Tapo P110")),
+                NetworkEntityState("switch.tapo_p110_led", "off", NetworkAttributes("Tapo P110 LED"))
+            )
+        }
+        val ws = FakeWebSocketDataSource().apply { error = HomeAssistantException.Unreachable }
+        val result = repo(ds, ws).getControllableEntities()
+
+        assertEquals(listOf("switch.tapo_p110", "switch.tapo_p110_led"), result.map { it.entityId })
     }
 
     @Test

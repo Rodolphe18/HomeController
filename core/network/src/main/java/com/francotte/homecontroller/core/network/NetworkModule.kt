@@ -49,4 +49,9 @@ internal object NetworkModule {
 internal abstract class NetworkBindsModule {
     @Binds
     abstract fun dataSource(impl: RetrofitHomeAssistantNetworkDataSource): HomeAssistantNetworkDataSource
+
+    @Binds
+    abstract fun webSocketDataSource(
+        impl: OkHttpHomeAssistantWebSocketDataSource
+    ): HomeAssistantWebSocketDataSource
 }
