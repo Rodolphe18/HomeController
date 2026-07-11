@@ -1,6 +1,7 @@
 package com.francotte.homecontroller.core.data
 
 import com.francotte.homecontroller.core.datastore.HomeAssistantConfiguration
+import com.francotte.homecontroller.core.model.EntityDetail
 import com.francotte.homecontroller.core.model.EntityRealtimeEvent
 import com.francotte.homecontroller.core.model.EntityStateChange
 import com.francotte.homecontroller.core.model.HomeAssistantConfig
@@ -33,12 +34,16 @@ class DefaultHomeAssistantRepositoryTest {
 
     private class FakeDataSource : HomeAssistantNetworkDataSource {
         var states: List<NetworkEntityState> = emptyList()
+        var stateResult: NetworkEntityState = NetworkEntityState("light.a", "on")
         var testError: Throwable? = null
         val serviceCalls = mutableListOf<Triple<String, String, String>>()
+        var lastBrightnessPct: Int? = null
         override suspend fun testConnection(config: HomeAssistantConfig) { testError?.let { throw it } }
         override suspend fun getStates(): List<NetworkEntityState> = states
-        override suspend fun callService(domain: String, service: String, entityId: String) {
+        override suspend fun getState(entityId: String): NetworkEntityState = stateResult
+        override suspend fun callService(domain: String, service: String, entityId: String, brightnessPct: Int?) {
             serviceCalls.add(Triple(domain, service, entityId))
+            lastBrightnessPct = brightnessPct
         }
     }
 
@@ -144,5 +149,52 @@ class DefaultHomeAssistantRepositoryTest {
             ),
             result
         )
+    }
+
+    @Test
+    fun `getEntityDetail mappe luminosite et supportsBrightness pour une lumiere`() = runTest {
+        val ds = FakeDataSource().apply {
+            stateResult = NetworkEntityState("light.salon", "on", NetworkAttributes("Salon", 128))
+        }
+        val detail = repo(ds).getEntityDetail("light.salon")
+        assertEquals("Salon", detail.friendlyName)
+        assertTrue(detail.isOn)
+        assertTrue(detail.supportsBrightness)
+        assertEquals(50, detail.brightnessPercent)
+    }
+
+    @Test
+    fun `getEntityDetail sur une prise n a pas de luminosite`() = runTest {
+        val ds = FakeDataSource().apply {
+            stateResult = NetworkEntityState("switch.prise", "off", NetworkAttributes("Prise"))
+        }
+        val detail = repo(ds).getEntityDetail("switch.prise")
+        assertFalse(detail.supportsBrightness)
+        assertEquals(0, detail.brightnessPercent)
+    }
+
+    @Test
+    fun `setBrightness a zero eteint`() = runTest {
+        val ds = FakeDataSource()
+        repo(ds).setBrightness("light.salon", 0)
+        assertEquals(Triple("light", "turn_off", "light.salon"), ds.serviceCalls.single())
+    }
+
+    @Test
+    fun `setBrightness positif allume avec le pourcentage`() = runTest {
+        val ds = FakeDataSource()
+        repo(ds).setBrightness("light.salon", 60)
+        assertEquals(Triple("light", "turn_on", "light.salon"), ds.serviceCalls.single())
+        assertEquals(60, ds.lastBrightnessPct)
+    }
+
+    @Test
+    fun `observeEntityStates propage la luminosite`() = runTest {
+        val ws = FakeWebSocketDataSource().apply {
+            events = listOf(WsStateEvent.Changed("light.a", "on", 75))
+        }
+        val result = repo(ws = ws).observeEntityStates().toList()
+        val change = (result.single() as EntityRealtimeEvent.Changed).change
+        assertEquals(75, change.brightnessPercent)
     }
 }

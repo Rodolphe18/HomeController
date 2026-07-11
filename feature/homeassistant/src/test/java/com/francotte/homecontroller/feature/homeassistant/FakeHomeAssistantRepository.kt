@@ -1,6 +1,7 @@
 package com.francotte.homecontroller.feature.homeassistant
 
 import com.francotte.homecontroller.core.data.HomeAssistantRepository
+import com.francotte.homecontroller.core.model.EntityDetail
 import com.francotte.homecontroller.core.model.EntityRealtimeEvent
 import com.francotte.homecontroller.core.model.HomeAssistantConfig
 import com.francotte.homecontroller.core.model.HomeAssistantEntity
@@ -34,4 +35,17 @@ class FakeHomeAssistantRepository : HomeAssistantRepository {
     private val realtime = MutableSharedFlow<EntityRealtimeEvent>(extraBufferCapacity = 16)
     override fun observeEntityStates(): Flow<EntityRealtimeEvent> = realtime
     suspend fun emitRealtime(event: EntityRealtimeEvent) { realtime.emit(event) }
+
+    var detail: EntityDetail? = null
+    var detailError: Throwable? = null
+    val brightnessCalls = mutableListOf<Pair<String, Int>>()
+    var setBrightnessError: Throwable? = null
+    override suspend fun getEntityDetail(entityId: String): EntityDetail {
+        detailError?.let { throw it }
+        return detail ?: error("FakeHomeAssistantRepository.detail non défini")
+    }
+    override suspend fun setBrightness(entityId: String, percent: Int) {
+        brightnessCalls.add(entityId to percent)
+        setBrightnessError?.let { throw it }
+    }
 }

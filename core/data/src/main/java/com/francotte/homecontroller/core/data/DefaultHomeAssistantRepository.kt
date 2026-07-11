@@ -1,6 +1,7 @@
 package com.francotte.homecontroller.core.data
 
 import com.francotte.homecontroller.core.datastore.HomeAssistantConfiguration
+import com.francotte.homecontroller.core.model.EntityDetail
 import com.francotte.homecontroller.core.model.EntityRealtimeEvent
 import com.francotte.homecontroller.core.model.EntityStateChange
 import com.francotte.homecontroller.core.model.HomeAssistantConfig
@@ -10,6 +11,7 @@ import com.francotte.homecontroller.core.network.HomeAssistantNetworkDataSource
 import com.francotte.homecontroller.core.network.HomeAssistantWebSocketDataSource
 import com.francotte.homecontroller.core.network.NetworkEntityState
 import com.francotte.homecontroller.core.network.WsStateEvent
+import com.francotte.homecontroller.core.network.brightnessRawToPercent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -52,6 +54,28 @@ internal class DefaultHomeAssistantRepository @Inject constructor(
             entityId = entityId
         )
 
+    override suspend fun getEntityDetail(entityId: String): EntityDetail {
+        val state = networkDataSource.getState(entityId)
+        val domain = entityId.substringBefore(".")
+        return EntityDetail(
+            entityId = state.entityId,
+            friendlyName = state.attributes.friendlyName ?: state.entityId,
+            domain = domain,
+            isOn = state.state == "on",
+            supportsBrightness = domain == "light",
+            brightnessPercent = state.attributes.brightness?.let { brightnessRawToPercent(it) } ?: 0
+        )
+    }
+
+    override suspend fun setBrightness(entityId: String, percent: Int) {
+        val domain = entityId.substringBefore(".")
+        if (percent <= 0) {
+            networkDataSource.callService(domain, "turn_off", entityId)
+        } else {
+            networkDataSource.callService(domain, "turn_on", entityId, brightnessPct = percent)
+        }
+    }
+
     override fun observeEntityStates(): Flow<EntityRealtimeEvent> =
         webSocketDataSource.observeStateChanges()
             .map { event ->
@@ -61,7 +85,8 @@ internal class DefaultHomeAssistantRepository @Inject constructor(
                         EntityStateChange(
                             entityId = event.entityId,
                             isOn = event.state == "on",
-                            rawState = event.state
+                            rawState = event.state,
+                            brightnessPercent = event.brightnessPercent
                         )
                     )
                 }

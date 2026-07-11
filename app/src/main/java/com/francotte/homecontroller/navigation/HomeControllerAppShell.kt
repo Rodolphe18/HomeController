@@ -23,6 +23,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.francotte.homecontroller.core.designsystem.AppIcons
 import com.francotte.homecontroller.feature.btclassic.BtClassicScanScreen
 import com.francotte.homecontroller.feature.devicedetail.DeviceControlScreen
+import com.francotte.homecontroller.feature.homeassistant.EntityDetailScreen
 import com.francotte.homecontroller.feature.homeassistant.HomeAssistantScreen
 import com.francotte.homecontroller.feature.scan.ScanScreen
 
@@ -67,7 +68,13 @@ fun HomeControllerAppShell() {
             entryDecorators = listOf(rememberViewModelStoreNavEntryDecorator()),
             entryProvider = entryProvider {
                 entry<HomeAssistantKey> {
-                    HomeAssistantScreen()
+                    HomeAssistantScreen(onEntityClick = { id -> haBackStack.add(EntityDetailKey(id)) })
+                }
+                entry<EntityDetailKey> { key ->
+                    EntityDetailScreen(
+                        entityId = key.entityId,
+                        onBack = { haBackStack.removeLastOrNull() }
+                    )
                 }
                 entry<ScanKey> {
                     ScanScreen(onDeviceClick = { address -> bleBackStack.add(DeviceControlKey(address)) })

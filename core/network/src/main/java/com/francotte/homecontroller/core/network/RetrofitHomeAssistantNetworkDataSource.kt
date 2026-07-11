@@ -20,8 +20,11 @@ internal class RetrofitHomeAssistantNetworkDataSource @Inject constructor(
     override suspend fun getStates(): List<NetworkEntityState> =
         call { api.getStates() }
 
-    override suspend fun callService(domain: String, service: String, entityId: String) =
-        call { api.callService(domain, service, NetworkServiceCall(entityId)) }
+    override suspend fun getState(entityId: String): NetworkEntityState =
+        call { api.getState(entityId) }
+
+    override suspend fun callService(domain: String, service: String, entityId: String, brightnessPct: Int?) =
+        call { api.callService(domain, service, NetworkServiceCall(entityId, brightnessPct)) }
 
     override suspend fun testConnection(config: HomeAssistantConfig) = withContext(Dispatchers.IO) {
         val url = config.baseUrl.trimEnd('/') + "/api/"

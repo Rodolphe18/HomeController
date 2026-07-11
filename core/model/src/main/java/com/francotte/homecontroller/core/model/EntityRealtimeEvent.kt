@@ -4,7 +4,8 @@ package com.francotte.homecontroller.core.model
 data class EntityStateChange(
     val entityId: String,
     val isOn: Boolean,
-    val rawState: String
+    val rawState: String,
+    val brightnessPercent: Int? = null   // null = event sans info luminosité
 )
 
 /** Événement du flux temps réel Home Assistant. */

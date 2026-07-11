@@ -1,9 +1,12 @@
 package com.francotte.homecontroller.core.domain
 
 import com.francotte.homecontroller.core.data.HomeAssistantRepository
+import com.francotte.homecontroller.core.model.EntityDetail
+import com.francotte.homecontroller.core.model.EntityRealtimeEvent
 import com.francotte.homecontroller.core.model.HomeAssistantConfig
 import com.francotte.homecontroller.core.model.HomeAssistantEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -20,6 +23,13 @@ class HomeAssistantUseCasesTest {
         override suspend fun getControllableEntities() =
             listOf(HomeAssistantEntity("light.a", "light", "A", true, "on"))
         override suspend fun setEntityState(entityId: String, on: Boolean) { toggles.add(entityId to on) }
+        override fun observeEntityStates(): Flow<EntityRealtimeEvent> = emptyFlow()
+        val brightnessCalls = mutableListOf<Pair<String, Int>>()
+        override suspend fun getEntityDetail(entityId: String): EntityDetail =
+            EntityDetail(entityId, "A", "light", true, true, 50)
+        override suspend fun setBrightness(entityId: String, percent: Int) {
+            brightnessCalls.add(entityId to percent)
+        }
     }
 
     @Test
@@ -40,5 +50,18 @@ class HomeAssistantUseCasesTest {
         val repo = FakeRepo()
         SaveConfigUseCase(repo)(HomeAssistantConfig("http://x:8123", "t"))
         assertEquals("http://x:8123", repo.savedConfig?.baseUrl)
+    }
+
+    @Test
+    fun `GetEntityDetail delegue au repository`() = runTest {
+        val detail = GetEntityDetailUseCase(FakeRepo())("light.a")
+        assertEquals("light.a", detail.entityId)
+    }
+
+    @Test
+    fun `SetBrightness delegue au repository`() = runTest {
+        val repo = FakeRepo()
+        SetBrightnessUseCase(repo)("light.a", 42)
+        assertEquals("light.a" to 42, repo.brightnessCalls.single())
     }
 }

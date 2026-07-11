@@ -16,10 +16,16 @@ class RetrofitHomeAssistantNetworkDataSourceTest {
 
     private class FakeApi : HomeAssistantApiService {
         var statesResult: () -> List<NetworkEntityState> = { emptyList() }
+        var stateResult: () -> NetworkEntityState = { NetworkEntityState("light.a", "on") }
         var callServiceResult: () -> Unit = {}
+        var lastServiceCall: NetworkServiceCall? = null
         override suspend fun ping(): NetworkApiInfo = NetworkApiInfo("API running.")
         override suspend fun getStates(): List<NetworkEntityState> = statesResult()
-        override suspend fun callService(domain: String, service: String, body: NetworkServiceCall) = callServiceResult()
+        override suspend fun getState(entityId: String): NetworkEntityState = stateResult()
+        override suspend fun callService(domain: String, service: String, body: NetworkServiceCall) {
+            lastServiceCall = body
+            callServiceResult()
+        }
     }
 
     @Test
@@ -44,5 +50,20 @@ class RetrofitHomeAssistantNetworkDataSourceTest {
         val ds = RetrofitHomeAssistantNetworkDataSource(fake)
         val error = runCatching { ds.getStates() }.exceptionOrNull()
         assertTrue(error is HomeAssistantException.Unreachable)
+    }
+
+    @Test
+    fun `getState renvoie l entite avec ses attributs`() = runTest {
+        val fake = api { stateResult = { NetworkEntityState("light.a", "on", NetworkAttributes("Salon", 128)) } }
+        val ds = RetrofitHomeAssistantNetworkDataSource(fake)
+        assertEquals(128, ds.getState("light.a").attributes.brightness)
+    }
+
+    @Test
+    fun `callService transmet brightness_pct dans le corps`() = runTest {
+        val fake = api {}
+        val ds = RetrofitHomeAssistantNetworkDataSource(fake)
+        ds.callService("light", "turn_on", "light.a", brightnessPct = 40)
+        assertEquals(40, fake.lastServiceCall?.brightnessPct)
     }
 }

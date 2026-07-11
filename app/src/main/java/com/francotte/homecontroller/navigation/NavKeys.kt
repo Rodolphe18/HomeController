@@ -9,3 +9,5 @@ data object BtClassicKey : NavKey
 data object ScanKey : NavKey
 
 data class DeviceControlKey(val address: String) : NavKey
+
+data class EntityDetailKey(val entityId: String) : NavKey

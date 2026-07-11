@@ -1,6 +1,7 @@
 package com.francotte.homecontroller.core.domain
 
 import com.francotte.homecontroller.core.data.HomeAssistantRepository
+import com.francotte.homecontroller.core.model.EntityDetail
 import com.francotte.homecontroller.core.model.EntityRealtimeEvent
 import com.francotte.homecontroller.core.model.HomeAssistantConfig
 import com.francotte.homecontroller.core.model.HomeAssistantEntity
@@ -29,4 +30,12 @@ class SetEntityStateUseCase @Inject constructor(private val repo: HomeAssistantR
 
 class ObserveEntityStatesUseCase @Inject constructor(private val repo: HomeAssistantRepository) {
     operator fun invoke(): Flow<EntityRealtimeEvent> = repo.observeEntityStates()
+}
+
+class GetEntityDetailUseCase @Inject constructor(private val repo: HomeAssistantRepository) {
+    suspend operator fun invoke(entityId: String): EntityDetail = repo.getEntityDetail(entityId)
+}
+
+class SetBrightnessUseCase @Inject constructor(private val repo: HomeAssistantRepository) {
+    suspend operator fun invoke(entityId: String, percent: Int) = repo.setBrightness(entityId, percent)
 }

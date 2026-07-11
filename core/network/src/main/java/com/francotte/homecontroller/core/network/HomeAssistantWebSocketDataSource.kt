@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.coroutines.flow.Flow
@@ -22,7 +23,11 @@ sealed interface WsStateEvent {
     /** Le `subscribe_events` est confirmé (reçu le `result`) — initial ou après reconnexion. */
     data object Subscribed : WsStateEvent
     /** Un event `state_changed` (données brutes de transport). */
-    data class Changed(val entityId: String, val state: String) : WsStateEvent
+    data class Changed(
+        val entityId: String,
+        val state: String,
+        val brightnessPercent: Int? = null
+    ) : WsStateEvent
 }
 
 /** Message d'authentification (pas de valeur par défaut : encodeDefaults=false les omettrait). */
@@ -49,8 +54,11 @@ internal fun parseStateChangedEvent(message: JsonObject): WsStateEvent.Changed? 
     val entityId = data["entity_id"]?.jsonPrimitive?.contentOrNull ?: return null
     val newStateElement = data["new_state"] ?: return null
     if (newStateElement is JsonNull) return null
-    val state = newStateElement.jsonObject["state"]?.jsonPrimitive?.contentOrNull ?: return null
-    return WsStateEvent.Changed(entityId, state)
+    val newState = newStateElement.jsonObject
+    val state = newState["state"]?.jsonPrimitive?.contentOrNull ?: return null
+    val brightnessRaw = newState["attributes"]?.jsonObject?.get("brightness")?.jsonPrimitive?.intOrNull
+    val brightnessPercent = brightnessRaw?.let { brightnessRawToPercent(it) }
+    return WsStateEvent.Changed(entityId, state, brightnessPercent)
 }
 
 /**

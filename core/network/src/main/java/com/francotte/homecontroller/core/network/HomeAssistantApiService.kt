@@ -12,6 +12,9 @@ internal interface HomeAssistantApiService {
     @GET("api/states")
     suspend fun getStates(): List<NetworkEntityState>
 
+    @GET("api/states/{entityId}")
+    suspend fun getState(@Path("entityId") entityId: String): NetworkEntityState
+
     @POST("api/services/{domain}/{service}")
     suspend fun callService(
         @Path("domain") domain: String,

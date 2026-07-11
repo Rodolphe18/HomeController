@@ -1,5 +1,6 @@
 package com.francotte.homecontroller.feature.homeassistant
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,6 +36,7 @@ import com.francotte.homecontroller.core.model.HomeAssistantEntity
 
 @Composable
 fun HomeAssistantScreen(
+    onEntityClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeAssistantViewModel = hiltViewModel()
 ) {
@@ -64,7 +66,8 @@ fun HomeAssistantScreen(
                     state = state,
                     onRefresh = viewModel::onRefresh,
                     onToggle = viewModel::onToggle,
-                    onEditConfig = viewModel::onEditConfig
+                    onEditConfig = viewModel::onEditConfig,
+                    onEntityClick = onEntityClick
                 )
             }
         }
@@ -107,7 +110,8 @@ private fun EntitiesContent(
     state: HomeAssistantUiState.Entities,
     onRefresh: () -> Unit,
     onToggle: (String, Boolean) -> Unit,
-    onEditConfig: () -> Unit
+    onEditConfig: () -> Unit,
+    onEntityClick: (String) -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -133,7 +137,7 @@ private fun EntitiesContent(
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(state.items, key = { it.entityId }) { entity ->
-                    EntityRow(entity, onToggle)
+                    EntityRow(entity, onToggle, onEntityClick)
                 }
             }
         }
@@ -141,8 +145,16 @@ private fun EntitiesContent(
 }
 
 @Composable
-private fun EntityRow(entity: HomeAssistantEntity, onToggle: (String, Boolean) -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+private fun EntityRow(
+    entity: HomeAssistantEntity,
+    onToggle: (String, Boolean) -> Unit,
+    onClick: (String) -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick(entity.entityId) }
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

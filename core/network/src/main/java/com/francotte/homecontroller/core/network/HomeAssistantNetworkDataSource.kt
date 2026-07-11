@@ -10,8 +10,10 @@ interface HomeAssistantNetworkDataSource {
     suspend fun testConnection(config: HomeAssistantConfig)
     /** Toutes les entités (non filtrées). */
     suspend fun getStates(): List<NetworkEntityState>
-    /** Appelle un service, ex. domain="light", service="turn_on". */
-    suspend fun callService(domain: String, service: String, entityId: String)
+    /** État d'une seule entité, avec ses attributs (ex. brightness). */
+    suspend fun getState(entityId: String): NetworkEntityState
+    /** Appelle un service, ex. domain="light", service="turn_on" ; brightnessPct optionnel. */
+    suspend fun callService(domain: String, service: String, entityId: String, brightnessPct: Int? = null)
 }
 
 /**
