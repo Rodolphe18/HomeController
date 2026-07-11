@@ -1,8 +1,10 @@
 package com.francotte.homecontroller.feature.devicedetail
 
+import androidx.compose.runtime.Immutable
 import com.francotte.homecontroller.core.model.EspConnectionState
 
 /** État de l'écran de contrôle d'un appareil. */
+@Immutable
 data class ControlUiState(
     val connection: EspConnectionState = EspConnectionState.Connecting,
     val counter: Int? = null,          // dernière valeur reçue, null tant qu'aucune notif

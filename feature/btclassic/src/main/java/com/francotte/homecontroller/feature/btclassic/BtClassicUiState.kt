@@ -1,5 +1,6 @@
 package com.francotte.homecontroller.feature.btclassic
 
+import androidx.compose.runtime.Immutable
 import com.francotte.homecontroller.core.model.BtClassicDevice
 
 /** État de l'écran de scan Bluetooth Classic. */
@@ -14,11 +15,14 @@ sealed interface BtClassicUiState {
     data object Idle : BtClassicUiState
 
     /** Découverte en cours ; [devices] triés. */
+    @Immutable
     data class Scanning(val devices: List<BtClassicDevice>) : BtClassicUiState
 
     /** Découverte terminée (une passe) ; [devices] triés ; relance manuelle. */
+    @Immutable
     data class Finished(val devices: List<BtClassicDevice>) : BtClassicUiState
 
     /** Échec de la découverte. */
+    @Immutable
     data class Error(val message: String) : BtClassicUiState
 }

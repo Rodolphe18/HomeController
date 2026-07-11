@@ -16,6 +16,14 @@ android {
     buildFeatures { compose = true }
 }
 
+composeCompiler {
+    // Traite les modeles immuables de :core:model comme stables cote Compose,
+    // sans dependance Compose dans la couche domaine.
+    stabilityConfigurationFiles.add(
+        rootProject.layout.projectDirectory.file("compose_stability.conf")
+    )
+}
+
 dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:designsystem"))
