@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Liaisons hub -> noeuds (petrole) -->
+    <path
+        android:strokeColor="#1F5E63"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M42,42 L38,38 M66,42 L70,38 M42,66 L38,70 M66,66 L70,70" />
+
+    <!-- Noeuds (petrole), rayon 5 -->
+    <path
+        android:fillColor="#1F5E63"
+        android:pathData="M29,34 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z
+                          M69,34 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z
+                          M29,74 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z
+                          M69,74 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z" />
+
+    <!-- Hub (rouille), carre arrondi 42..66, rayon de coin 5 -->
+    <path
+        android:fillColor="#9A431D"
+        android:pathData="M47,42 L61,42 Q66,42 66,47 L66,61 Q66,66 61,66 L47,66 Q42,66 42,61 L42,47 Q42,42 47,42 Z" />
+</vector>
