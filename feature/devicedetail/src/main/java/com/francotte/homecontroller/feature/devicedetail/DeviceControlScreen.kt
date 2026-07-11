@@ -20,6 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.francotte.homecontroller.core.designsystem.AppIcons
+import com.francotte.homecontroller.core.designsystem.component.LoadingState
+import com.francotte.homecontroller.core.designsystem.component.StatusAction
+import com.francotte.homecontroller.core.designsystem.component.StatusScreen
 import com.francotte.homecontroller.core.model.EspConnectionState
 
 @Composable
@@ -45,7 +49,7 @@ fun DeviceControlScreen(
 
             when (val connection = uiState.connection) {
                 EspConnectionState.Connecting ->
-                    Text("Connexion en cours…")
+                    LoadingState(label = "Connexion en cours…")
 
                 EspConnectionState.Connected -> {
                     Row(
@@ -63,15 +67,19 @@ fun DeviceControlScreen(
                     uiState.transientError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                 }
 
-                EspConnectionState.Disconnected -> {
-                    Text("Déconnecté.")
-                    Button(onClick = { viewModel.onRetry() }) { Text("Reconnecter") }
-                }
+                EspConnectionState.Disconnected -> StatusScreen(
+                    icon = AppIcons.BluetoothDisabled,
+                    title = "Déconnecté",
+                    description = "La connexion avec l'appareil ESP32 est fermée.",
+                    primaryAction = StatusAction("Reconnecter") { viewModel.onRetry() }
+                )
 
-                is EspConnectionState.Error -> {
-                    Text(connection.message, color = MaterialTheme.colorScheme.error)
-                    Button(onClick = { viewModel.onRetry() }) { Text("Réessayer") }
-                }
+                is EspConnectionState.Error -> StatusScreen(
+                    icon = AppIcons.Warning,
+                    title = "Erreur de connexion",
+                    description = connection.message,
+                    primaryAction = StatusAction("Réessayer") { viewModel.onRetry() }
+                )
             }
 
             Spacer(Modifier.height(8.dp))

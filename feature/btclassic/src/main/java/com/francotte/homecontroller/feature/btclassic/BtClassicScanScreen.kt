@@ -37,6 +37,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.francotte.homecontroller.core.designsystem.AppIcons
+import com.francotte.homecontroller.core.designsystem.component.StatusAction
+import com.francotte.homecontroller.core.designsystem.component.StatusScreen
 import com.francotte.homecontroller.core.model.BtClassicDevice
 
 /** Permissions runtime selon la version Android (mêmes que le scan BLE). */
@@ -90,64 +93,84 @@ fun BtClassicScanScreen(
     LaunchedEffect(Unit) { refreshAvailability() }
 
     Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            when (val state = uiState) {
-                BtClassicUiState.PermissionRequired -> GateMessage(
-                    message = "L'application a besoin de la permission Bluetooth pour scanner les appareils.",
-                    actionLabel = "Accorder la permission",
-                    onAction = { permissionLauncher.launch(requiredScanPermissions()) }
-                )
-
-                BtClassicUiState.BluetoothOff -> GateMessage(
-                    message = "Le Bluetooth est désactivé.",
-                    actionLabel = "Activer le Bluetooth",
-                    onAction = {
-                        enableBluetoothLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
-                    }
-                )
-
-                BtClassicUiState.Idle -> {
-                    Button(onClick = { viewModel.startScan() }) { Text("Scanner") }
-                    Spacer(Modifier.height(16.dp))
-                    Text("Prêt à scanner les appareils Bluetooth Classic.")
+        when (val state = uiState) {
+            BtClassicUiState.PermissionRequired -> StatusScreen(
+                modifier = Modifier.padding(innerPadding),
+                icon = AppIcons.Lock,
+                title = "Permission requise",
+                description = "HomeController a besoin de la permission Bluetooth pour scanner les appareils.",
+                primaryAction = StatusAction("Accorder la permission") {
+                    permissionLauncher.launch(requiredScanPermissions())
                 }
+            )
 
-                is BtClassicUiState.Scanning -> {
-                    Button(onClick = { viewModel.stopScan() }) { Text("Arrêter") }
-                    Spacer(Modifier.height(16.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        CircularProgressIndicator(Modifier.size(20.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text("Recherche d'appareils…")
-                    }
-                    Spacer(Modifier.height(12.dp))
-                    DeviceList(state.devices)
+            BtClassicUiState.BluetoothOff -> StatusScreen(
+                modifier = Modifier.padding(innerPadding),
+                icon = AppIcons.BluetoothDisabled,
+                title = "Bluetooth désactivé",
+                description = "Activez le Bluetooth pour scanner les appareils Bluetooth Classic.",
+                primaryAction = StatusAction("Activer le Bluetooth") {
+                    enableBluetoothLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
                 }
+            )
 
-                is BtClassicUiState.Finished -> {
-                    Button(onClick = { viewModel.startScan() }) { Text("Scanner à nouveau") }
-                    Spacer(Modifier.height(16.dp))
-                    if (state.devices.isEmpty()) {
-                        Text("Aucun appareil trouvé.")
-                    } else {
+            BtClassicUiState.Idle -> StatusScreen(
+                modifier = Modifier.padding(innerPadding),
+                icon = AppIcons.Bluetooth,
+                title = "Prêt à scanner",
+                description = "Lancez une recherche pour découvrir les appareils Bluetooth Classic appairés et à proximité.",
+                primaryAction = StatusAction("Scanner") { viewModel.startScan() }
+            )
+
+            is BtClassicUiState.Scanning -> Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                Button(onClick = { viewModel.stopScan() }) { Text("Arrêter") }
+                Spacer(Modifier.height(16.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator(Modifier.size(20.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Recherche d'appareils…")
+                }
+                Spacer(Modifier.height(12.dp))
+                DeviceList(state.devices)
+            }
+
+            is BtClassicUiState.Finished ->
+                if (state.devices.isEmpty()) {
+                    StatusScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        icon = AppIcons.Bluetooth,
+                        title = "Aucun appareil trouvé",
+                        description = "Aucun appareil Bluetooth Classic n'a été détecté. Vérifiez qu'ils sont allumés et visibles.",
+                        primaryAction = StatusAction("Scanner à nouveau") { viewModel.startScan() }
+                    )
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize()
+                            .padding(16.dp)
+                    ) {
+                        Button(onClick = { viewModel.startScan() }) { Text("Scanner à nouveau") }
+                        Spacer(Modifier.height(16.dp))
                         DeviceList(state.devices)
                     }
                 }
 
-                is BtClassicUiState.Error -> GateMessage(
-                    message = state.message,
-                    actionLabel = "Réessayer",
-                    onAction = {
-                        refreshAvailability()
-                        viewModel.startScan()
-                    }
-                )
-            }
+            is BtClassicUiState.Error -> StatusScreen(
+                modifier = Modifier.padding(innerPadding),
+                icon = AppIcons.Warning,
+                title = "Une erreur est survenue",
+                description = state.message,
+                primaryAction = StatusAction("Réessayer") {
+                    refreshAvailability()
+                    viewModel.startScan()
+                }
+            )
         }
     }
 }
@@ -204,13 +227,5 @@ private fun DeviceRow(device: BtClassicDevice) {
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun GateMessage(message: String, actionLabel: String, onAction: () -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(message)
-        Button(onClick = onAction) { Text(actionLabel) }
     }
 }

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -19,6 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.francotte.homecontroller.core.designsystem.AppIcons
+import com.francotte.homecontroller.core.designsystem.component.LoadingState
+import com.francotte.homecontroller.core.designsystem.component.StatusAction
+import com.francotte.homecontroller.core.designsystem.component.StatusScreen
 
 @Composable
 fun EntityDetailScreen(
@@ -42,12 +45,14 @@ fun EntityDetailScreen(
         ) {
             when (val state = uiState) {
                 EntityDetailUiState.Loading ->
-                    CircularProgressIndicator()
+                    LoadingState(label = "Chargement…")
 
-                is EntityDetailUiState.Error -> {
-                    Text(state.message, color = MaterialTheme.colorScheme.error)
-                    Button(onClick = onBack) { Text("Retour") }
-                }
+                is EntityDetailUiState.Error -> StatusScreen(
+                    icon = AppIcons.Warning,
+                    title = "Impossible de charger l'appareil",
+                    description = state.message,
+                    primaryAction = StatusAction("Retour", onBack)
+                )
 
                 is EntityDetailUiState.Content -> {
                     Text(state.friendlyName, style = MaterialTheme.typography.titleLarge)

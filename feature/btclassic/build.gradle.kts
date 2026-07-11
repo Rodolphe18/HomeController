@@ -18,6 +18,7 @@ android {
 
 dependencies {
     implementation(project(":core:model"))
+    implementation(project(":core:designsystem"))
     implementation(project(":core:bluetooth"))
 
     implementation(platform(libs.androidx.compose.bom))

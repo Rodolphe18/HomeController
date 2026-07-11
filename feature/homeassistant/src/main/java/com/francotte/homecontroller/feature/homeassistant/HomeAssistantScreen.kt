@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.francotte.homecontroller.core.designsystem.AppIcons
+import com.francotte.homecontroller.core.designsystem.component.LoadingState
+import com.francotte.homecontroller.core.designsystem.component.StatusScreen
 import com.francotte.homecontroller.core.model.HomeAssistantEntity
 
 @Composable
@@ -53,7 +54,7 @@ fun HomeAssistantScreen(
         ) {
             when (val state = uiState) {
                 HomeAssistantUiState.Loading ->
-                    CircularProgressIndicator()
+                    LoadingState(label = "Chargement…")
 
                 is HomeAssistantUiState.Unconfigured -> ConfigForm(
                     form = state.form,
@@ -133,7 +134,11 @@ private fun EntitiesContent(
         modifier = Modifier.fillMaxSize()
     ) {
         if (state.items.isEmpty() && state.listError == null) {
-            Text("Aucune lumière ni prise trouvée.")
+            StatusScreen(
+                icon = AppIcons.LightbulbEmpty,
+                title = "Aucun appareil",
+                description = "Aucune lumière ni prise commandable n'a été trouvée sur votre instance Home Assistant."
+            )
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(state.items, key = { it.entityId }) { entity ->

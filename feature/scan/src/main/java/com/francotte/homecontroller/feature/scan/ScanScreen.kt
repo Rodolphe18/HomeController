@@ -12,32 +12,31 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.francotte.homecontroller.core.designsystem.AppIcons
+import com.francotte.homecontroller.core.designsystem.component.LoadingState
+import com.francotte.homecontroller.core.designsystem.component.StatusAction
+import com.francotte.homecontroller.core.designsystem.component.StatusScreen
 import com.francotte.homecontroller.core.model.BleDevice
 
 /** Permissions runtime à demander, selon la version Android. */
@@ -92,64 +91,65 @@ fun ScanScreen(
     LaunchedEffect(Unit) { refreshAvailability() }
 
     Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            when (val state = uiState) {
-                ScanUiState.PermissionRequired -> GateMessage(
-                    message = "L'application a besoin de la permission Bluetooth pour scanner les appareils.",
-                    actionLabel = "Accorder la permission",
-                    onAction = { permissionLauncher.launch(requiredScanPermissions()) }
-                )
-
-                ScanUiState.BluetoothOff -> GateMessage(
-                    message = "Le Bluetooth est désactivé.",
-                    actionLabel = "Activer le Bluetooth",
-                    onAction = {
-                        enableBluetoothLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
-                    }
-                )
-
-                ScanUiState.Idle -> {
-                    ScanButton(isScanning = false, onClick = { viewModel.startScan() })
-                    Spacer(Modifier.height(16.dp))
-                    Text("Prêt à scanner.")
+        when (val state = uiState) {
+            ScanUiState.PermissionRequired -> StatusScreen(
+                modifier = Modifier.padding(innerPadding),
+                icon = AppIcons.Lock,
+                title = "Permission requise",
+                description = "HomeController a besoin de la permission Bluetooth pour trouver vos appareils à proximité.",
+                primaryAction = StatusAction("Accorder la permission") {
+                    permissionLauncher.launch(requiredScanPermissions())
                 }
+            )
 
-                is ScanUiState.Scanning -> {
-                    ScanButton(isScanning = true, onClick = { viewModel.stopScan() })
-                    Spacer(Modifier.height(16.dp))
-                    if (state.devices.isEmpty()) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            CircularProgressIndicator(Modifier.size(20.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Text("Recherche d'appareils…")
-                        }
-                    } else {
+            ScanUiState.BluetoothOff -> StatusScreen(
+                modifier = Modifier.padding(innerPadding),
+                icon = AppIcons.BluetoothDisabled,
+                title = "Bluetooth désactivé",
+                description = "Activez le Bluetooth pour scanner les appareils autour de vous.",
+                primaryAction = StatusAction("Activer le Bluetooth") {
+                    enableBluetoothLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
+                }
+            )
+
+            ScanUiState.Idle -> StatusScreen(
+                modifier = Modifier.padding(innerPadding),
+                icon = AppIcons.Bluetooth,
+                title = "Prêt à scanner",
+                description = "Lancez une recherche pour découvrir les appareils Bluetooth Low Energy autour de vous.",
+                primaryAction = StatusAction("Démarrer le scan") { viewModel.startScan() }
+            )
+
+            is ScanUiState.Scanning ->
+                if (state.devices.isEmpty()) {
+                    LoadingState(
+                        modifier = Modifier.padding(innerPadding),
+                        label = "Recherche d'appareils…"
+                    )
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize()
+                            .padding(16.dp)
+                    ) {
+                        Button(onClick = { viewModel.stopScan() }) { Text("Arrêter le scan") }
+                        Spacer(Modifier.height(16.dp))
                         DeviceList(state.devices, onDeviceClick)
                     }
                 }
 
-                is ScanUiState.Error -> GateMessage(
-                    message = state.message,
-                    actionLabel = "Réessayer",
-                    onAction = {
-                        refreshAvailability()
-                        viewModel.startScan()
-                    }
-                )
-            }
+            is ScanUiState.Error -> StatusScreen(
+                modifier = Modifier.padding(innerPadding),
+                icon = AppIcons.Warning,
+                title = "Une erreur est survenue",
+                description = state.message,
+                primaryAction = StatusAction("Réessayer") {
+                    refreshAvailability()
+                    viewModel.startScan()
+                }
+            )
         }
-    }
-}
-
-@Composable
-private fun ScanButton(isScanning: Boolean, onClick: () -> Unit) {
-    Button(onClick = onClick) {
-        Text(if (isScanning) "Arrêter le scan" else "Démarrer le scan")
     }
 }
 
@@ -177,13 +177,5 @@ private fun DeviceRow(device: BleDevice, onClick: () -> Unit) {
             Text(text = device.address, style = MaterialTheme.typography.bodySmall)
             Text(text = "${device.rssi} dBm", style = MaterialTheme.typography.bodySmall)
         }
-    }
-}
-
-@Composable
-private fun GateMessage(message: String, actionLabel: String, onAction: () -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(message)
-        Button(onClick = onAction) { Text(actionLabel) }
     }
 }
