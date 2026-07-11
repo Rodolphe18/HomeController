@@ -167,9 +167,9 @@ private fun EntityRow(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
-                Text(entity.friendlyName, style = MaterialTheme.typography.titleSmall)
-                Text(entity.entityId, style = MaterialTheme.typography.bodySmall)
+            Column(Modifier.weight(1f)) {
+                Text(entity.friendlyName, style = MaterialTheme.typography.titleMedium)
+                Text(entity.entityId, style = MaterialTheme.typography.labelSmall)
             }
             Switch(checked = entity.isOn, onCheckedChange = { onToggle(entity.entityId, it) })
         }

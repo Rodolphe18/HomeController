@@ -9,6 +9,7 @@ package com.francotte.homecontroller.core.model
  * @property isOn        true si l'état HA vaut "on"
  * @property rawState    état brut renvoyé par HA (ex. "on", "off", "unavailable")
  */
+
 data class HomeAssistantEntity(
     val entityId: String,
     val domain: String,

@@ -69,8 +69,8 @@ fun EntityDetailScreen(
                             onValueChange = viewModel::onBrightnessDrag,
                             onValueChangeFinished = viewModel::onBrightnessCommit,
                             modifier = Modifier
-                                .fillMaxHeight(0.5f)
-                                .width(96.dp)
+                                .fillMaxHeight(0.6f)
+                                .width(130.dp)
                         )
                     } else {
                         Switch(checked = state.isOn, onCheckedChange = viewModel::onToggle)
