@@ -2,46 +2,59 @@ package com.francotte.homecontroller.core.network
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.coroutines.flow.Flow
 
 /**
- * Accès au registre d'entités de Home Assistant via l'API WebSocket.
- *
- * L'attribut `entity_category` (absent de `/api/states`) distingue les entités de contrôle
- * principales (catégorie nulle) des entités auxiliaires (`config`/`diagnostic`, ex. LED,
- * arrêt auto, mise à jour). Seul le WebSocket l'expose (`config/entity_registry/list`).
+ * Accès temps réel à Home Assistant via l'API WebSocket : abonnement `subscribe_events`
+ * (`state_changed`). Émet [WsStateEvent.Subscribed] à chaque (ré)abonnement confirmé,
+ * puis un [WsStateEvent.Changed] par changement d'état.
  */
 interface HomeAssistantWebSocketDataSource {
-    /** Le registre d'entités. Lève une [com.francotte.homecontroller.core.model.HomeAssistantException]. */
-    suspend fun getEntityRegistry(): List<EntityRegistryEntry>
+    fun observeStateChanges(): Flow<WsStateEvent>
 }
 
-/** Une entrée du registre d'entités : ce dont on a besoin pour filtrer. */
-@Serializable
-data class EntityRegistryEntry(
-    @SerialName("entity_id") val entityId: String,
-    @SerialName("entity_category") val entityCategory: String? = null
-)
+sealed interface WsStateEvent {
+    /** Le `subscribe_events` est confirmé (reçu le `result`) — initial ou après reconnexion. */
+    data object Subscribed : WsStateEvent
+    /** Un event `state_changed` (données brutes de transport). */
+    data class Changed(val entityId: String, val state: String) : WsStateEvent
+}
 
-/**
- * Message d'authentification envoyé après `auth_required`.
- * `type` n'a PAS de valeur par défaut : avec `encodeDefaults=false` (défaut kotlinx),
- * un champ à valeur par défaut serait omis et HA rejetterait l'auth (`auth_invalid`).
- */
+/** Message d'authentification (pas de valeur par défaut : encodeDefaults=false les omettrait). */
 @Serializable
 internal data class WsAuthMessage(
     val type: String,
     @SerialName("access_token") val accessToken: String
 )
 
-/** Commande WebSocket (ex. `config/entity_registry/list`) portant un identifiant de corrélation. */
+/** Commande d'abonnement aux events (pas de valeur par défaut). */
 @Serializable
-internal data class WsCommandMessage(
+internal data class WsSubscribeMessage(
     val id: Int,
-    val type: String
+    val type: String,
+    @SerialName("event_type") val eventType: String
 )
 
 /**
- * Dérive l'URL WebSocket HA à partir de l'URL de base HTTP. Fonction pure → testable sans réseau.
+ * Extrait un [WsStateEvent.Changed] d'un message HA de type `event`. Renvoie `null` si
+ * `new_state` est absent/`null` (entité supprimée) ou si un champ requis manque. Fonction pure.
+ */
+internal fun parseStateChangedEvent(message: JsonObject): WsStateEvent.Changed? {
+    val data = message["event"]?.jsonObject?.get("data")?.jsonObject ?: return null
+    val entityId = data["entity_id"]?.jsonPrimitive?.contentOrNull ?: return null
+    val newStateElement = data["new_state"] ?: return null
+    if (newStateElement is JsonNull) return null
+    val state = newStateElement.jsonObject["state"]?.jsonPrimitive?.contentOrNull ?: return null
+    return WsStateEvent.Changed(entityId, state)
+}
+
+/**
+ * Dérive l'URL WebSocket HA à partir de l'URL de base HTTP. Fonction pure.
  * `http://host:8123` → `ws://host:8123/api/websocket` ; `https` → `wss`.
  */
 internal fun webSocketUrl(baseUrl: String): String {

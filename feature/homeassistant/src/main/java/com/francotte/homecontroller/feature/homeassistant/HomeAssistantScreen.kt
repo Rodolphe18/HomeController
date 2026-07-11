@@ -38,6 +38,8 @@ fun HomeAssistantScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeAssistantViewModel = hiltViewModel()
 ) {
+    // Collecte lifecycle-aware : STARTED (écran visible) + 5 s de grâce côté ViewModel
+    // (WhileSubscribed) pilotent à la fois l'affichage et la vie de la connexion WebSocket.
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(modifier = modifier.fillMaxSize()) { padding ->

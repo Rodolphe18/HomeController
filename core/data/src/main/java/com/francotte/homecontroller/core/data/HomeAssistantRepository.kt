@@ -1,5 +1,6 @@
 package com.francotte.homecontroller.core.data
 
+import com.francotte.homecontroller.core.model.EntityRealtimeEvent
 import com.francotte.homecontroller.core.model.HomeAssistantConfig
 import com.francotte.homecontroller.core.model.HomeAssistantEntity
 import kotlinx.coroutines.flow.Flow
@@ -13,4 +14,6 @@ interface HomeAssistantRepository {
     suspend fun getControllableEntities(): List<HomeAssistantEntity>
     /** Allume/éteint une entité (turn_on / turn_off sur son domaine). */
     suspend fun setEntityState(entityId: String, on: Boolean)
+    /** Flux temps réel des états d'entités (WebSocket, reconnexion gérée en interne). */
+    fun observeEntityStates(): Flow<EntityRealtimeEvent>
 }

@@ -1,6 +1,7 @@
 package com.francotte.homecontroller.core.domain
 
 import com.francotte.homecontroller.core.data.HomeAssistantRepository
+import com.francotte.homecontroller.core.model.EntityRealtimeEvent
 import com.francotte.homecontroller.core.model.HomeAssistantConfig
 import com.francotte.homecontroller.core.model.HomeAssistantEntity
 import kotlinx.coroutines.flow.Flow
@@ -24,4 +25,8 @@ class GetControllableEntitiesUseCase @Inject constructor(private val repo: HomeA
 
 class SetEntityStateUseCase @Inject constructor(private val repo: HomeAssistantRepository) {
     suspend operator fun invoke(entityId: String, on: Boolean) = repo.setEntityState(entityId, on)
+}
+
+class ObserveEntityStatesUseCase @Inject constructor(private val repo: HomeAssistantRepository) {
+    operator fun invoke(): Flow<EntityRealtimeEvent> = repo.observeEntityStates()
 }

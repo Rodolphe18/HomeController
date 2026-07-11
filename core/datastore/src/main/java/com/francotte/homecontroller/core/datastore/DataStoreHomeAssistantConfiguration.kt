@@ -17,19 +17,18 @@ import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private val Context.configDataStore: DataStore<Preferences> by
-    preferencesDataStore(name = "home_assistant_config")
+private val Context.configurationDataStore: DataStore<Preferences> by preferencesDataStore(name = "home_assistant_config")
 
 @Singleton
-internal class DataStoreHomeAssistantConfigStore @Inject constructor(
+internal class DataStoreHomeAssistantConfiguration @Inject constructor(
     @ApplicationContext context: Context
-) : HomeAssistantConfigStore {
+) : HomeAssistantConfiguration {
 
-    private val dataStore = context.configDataStore
+    private val dataStore = context.configurationDataStore
 
     // Seed synchrone (lecture unique, petite) pour offrir un `.value` à l'interceptor réseau.
-    private val _config = MutableStateFlow(runBlocking { read() })
-    override val config: StateFlow<HomeAssistantConfig?> = _config.asStateFlow()
+    private val _configuration = MutableStateFlow(runBlocking { read() })
+    override val configuration: StateFlow<HomeAssistantConfig?> = _configuration.asStateFlow()
 
     override suspend fun save(config: HomeAssistantConfig) {
         val sealed = TokenCrypto.encrypt(config.token)
@@ -38,12 +37,12 @@ internal class DataStoreHomeAssistantConfigStore @Inject constructor(
             prefs[KEY_TOKEN_CIPHER] = sealed.ciphertext.toBase64()
             prefs[KEY_TOKEN_IV] = sealed.iv.toBase64()
         }
-        _config.value = config
+        _configuration.value = config
     }
 
     override suspend fun clear() {
         dataStore.edit { it.clear() }
-        _config.value = null
+        _configuration.value = null
     }
 
     private suspend fun read(): HomeAssistantConfig? {

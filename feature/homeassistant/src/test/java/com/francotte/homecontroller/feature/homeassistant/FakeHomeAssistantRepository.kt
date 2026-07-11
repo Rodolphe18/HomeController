@@ -1,9 +1,11 @@
 package com.francotte.homecontroller.feature.homeassistant
 
 import com.francotte.homecontroller.core.data.HomeAssistantRepository
+import com.francotte.homecontroller.core.model.EntityRealtimeEvent
 import com.francotte.homecontroller.core.model.HomeAssistantConfig
 import com.francotte.homecontroller.core.model.HomeAssistantEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class FakeHomeAssistantRepository : HomeAssistantRepository {
@@ -28,4 +30,8 @@ class FakeHomeAssistantRepository : HomeAssistantRepository {
         // succès : HA reflète le nouvel état pour la réconciliation (rechargement).
         entities = entities.map { if (it.entityId == entityId) it.copy(isOn = on) else it }
     }
+
+    private val realtime = MutableSharedFlow<EntityRealtimeEvent>(extraBufferCapacity = 16)
+    override fun observeEntityStates(): Flow<EntityRealtimeEvent> = realtime
+    suspend fun emitRealtime(event: EntityRealtimeEvent) { realtime.emit(event) }
 }
