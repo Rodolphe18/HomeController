@@ -7,5 +7,11 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="splash_background">#FFF8F5</color>
+    <!-- Palette de marque « Indigo Électrique » (miroir XML de core:designsystem theme/Color.kt) -->
+    <color name="indigo_electric">#FF3B5BF0</color> <!-- bleu-indigo vif : hub du logo -->
+    <color name="magenta_vivid">#FFE5468C</color>  <!-- magenta vif : noeuds du logo -->
+    <color name="indigo_black">#FF131022</color>   <!-- indigo-noir : fond sombre / splash -->
+
+    <!-- Fond de l'écran de démarrage (toujours sombre, l'app est forcée en nuit). -->
+    <color name="splash_background">@color/indigo_black</color>
 </resources>

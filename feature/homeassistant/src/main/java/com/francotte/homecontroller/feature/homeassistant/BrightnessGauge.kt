@@ -44,10 +44,10 @@ fun BrightnessGauge(
     var heightPx by remember { mutableFloatStateOf(0f) }
     var latest by remember { mutableIntStateOf(percent) }
     val fillColor = MaterialTheme.colorScheme.primary
-    val trackColor = MaterialTheme.colorScheme.surfaceVariant
+    val trackColor = MaterialTheme.colorScheme.surfaceContainerHighest
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(36.dp))
             .background(trackColor)
             .onSizeChanged { heightPx = it.height.toFloat() }
             .pointerInput(Unit) {

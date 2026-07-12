@@ -4,9 +4,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -55,15 +58,32 @@ fun EntityDetailScreen(
                 )
 
                 is EntityDetailUiState.Content -> {
-                    Text(state.friendlyName, style = MaterialTheme.typography.titleLarge)
-                    Text(
-                        if (state.isOn) "Allumée" else "Éteinte",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    if (state.supportsBrightness) {
-                        if (state.isOn) {
-                            Text("${state.brightnessPercent} %", style = MaterialTheme.typography.headlineSmall)
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (state.isOn) MaterialTheme.colorScheme.primaryContainer
+                            else MaterialTheme.colorScheme.surfaceContainer
+                        ),
+                        shape = MaterialTheme.shapes.extraLarge,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(20.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(state.friendlyName, style = MaterialTheme.typography.headlineSmall)
+                            Text(
+                                if (state.isOn) "Allumée" else "Éteinte",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            if (state.supportsBrightness && state.isOn) {
+                                Text(
+                                    "${state.brightnessPercent} %",
+                                    style = MaterialTheme.typography.displaySmall
+                                )
+                            }
                         }
+                    }
+                    if (state.supportsBrightness) {
                         BrightnessGauge(
                             percent = state.brightnessPercent,
                             onValueChange = viewModel::onBrightnessDrag,

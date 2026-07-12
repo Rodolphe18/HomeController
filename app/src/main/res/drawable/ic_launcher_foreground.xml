@@ -5,23 +5,23 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Liaisons hub -> noeuds (petrole) -->
+    <!-- Liaisons hub -> noeuds (magenta) -->
     <path
-        android:strokeColor="#1F5E63"
+        android:strokeColor="@color/magenta_vivid"
         android:strokeWidth="3"
         android:strokeLineCap="round"
         android:pathData="M43,43 L39,39 M65,43 L69,39 M43,65 L39,69 M65,65 L69,69" />
 
-    <!-- Noeuds (petrole), rayon 5 -->
+    <!-- Noeuds (magenta), rayon 5 -->
     <path
-        android:fillColor="#1F5E63"
+        android:fillColor="@color/magenta_vivid"
         android:pathData="M31,36 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z
                           M67,36 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z
                           M31,72 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z
                           M67,72 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z" />
 
-    <!-- Hub (rouille), carre arrondi 43..65, rayon de coin 5 -->
+    <!-- Hub (indigo), carre arrondi 43..65, rayon de coin 5 -->
     <path
-        android:fillColor="#9A431D"
+        android:fillColor="@color/indigo_electric"
         android:pathData="M48,43 L60,43 Q65,43 65,48 L65,60 Q65,65 60,65 L48,65 Q43,65 43,60 L43,48 Q43,43 48,43 Z" />
 </vector>
