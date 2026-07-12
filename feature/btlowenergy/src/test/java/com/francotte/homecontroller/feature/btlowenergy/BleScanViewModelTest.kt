@@ -1,4 +1,4 @@
-package com.francotte.homecontroller.feature.scan
+package com.francotte.homecontroller.feature.btlowenergy
 
 import com.francotte.homecontroller.core.bluetooth.BleScanException
 import com.francotte.homecontroller.core.model.BleDevice
@@ -17,7 +17,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ScanViewModelTest {
+class BleScanViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
@@ -27,36 +27,36 @@ class ScanViewModelTest {
 
     @Test
     fun `etat initial est PermissionRequired`() {
-        val vm = ScanViewModel(FakeBleScanner(flowOf(emptyList())))
-        assertEquals(ScanUiState.PermissionRequired, vm.uiState.value)
+        val vm = BleScanViewModel(FakeBleScanner(flowOf(emptyList())))
+        assertEquals(BleScanUiState.PermissionRequired, vm.uiState.value)
     }
 
     @Test
     fun `sans permission reste PermissionRequired`() {
-        val vm = ScanViewModel(FakeBleScanner(flowOf(emptyList())))
+        val vm = BleScanViewModel(FakeBleScanner(flowOf(emptyList())))
         vm.updateAvailability(hasPermissions = false, isBluetoothEnabled = true)
-        assertEquals(ScanUiState.PermissionRequired, vm.uiState.value)
+        assertEquals(BleScanUiState.PermissionRequired, vm.uiState.value)
     }
 
     @Test
     fun `permission OK mais bluetooth eteint donne BluetoothOff`() {
-        val vm = ScanViewModel(FakeBleScanner(flowOf(emptyList())))
+        val vm = BleScanViewModel(FakeBleScanner(flowOf(emptyList())))
         vm.updateAvailability(hasPermissions = true, isBluetoothEnabled = false)
-        assertEquals(ScanUiState.BluetoothOff, vm.uiState.value)
+        assertEquals(BleScanUiState.BluetoothOff, vm.uiState.value)
     }
 
     @Test
     fun `permission OK et bluetooth ON donne Idle`() {
-        val vm = ScanViewModel(FakeBleScanner(flowOf(emptyList())))
+        val vm = BleScanViewModel(FakeBleScanner(flowOf(emptyList())))
         vm.updateAvailability(hasPermissions = true, isBluetoothEnabled = true)
-        assertEquals(ScanUiState.Idle, vm.uiState.value)
+        assertEquals(BleScanUiState.Idle, vm.uiState.value)
     }
 
     @Test
     fun `startScan publie les appareils tries par RSSI decroissant a la cadence de rafraichissement`() = runTest {
         val devices = listOf(device("AA", -80), device("BB", -40), device("CC", -60))
         // Flux qui émet puis reste ouvert, pour laisser un tick de sample se produire.
-        val vm = ScanViewModel(
+        val vm = BleScanViewModel(
             FakeBleScanner(flow { emit(devices); awaitCancellation() })
         )
         vm.updateAvailability(hasPermissions = true, isBluetoothEnabled = true)
@@ -66,10 +66,10 @@ class ScanViewModelTest {
         runCurrent()
 
         val state = vm.uiState.value
-        assertTrue(state is ScanUiState.Scanning)
+        assertTrue(state is BleScanUiState.Scanning)
         assertEquals(
             listOf("BB", "CC", "AA"),
-            (state as ScanUiState.Scanning).devices.map { it.address }
+            (state as BleScanUiState.Scanning).devices.map { it.address }
         )
 
         vm.stopScan()
@@ -77,34 +77,34 @@ class ScanViewModelTest {
 
     @Test
     fun `startScan sans disponibilite ne fait rien`() = runTest {
-        val vm = ScanViewModel(FakeBleScanner(flowOf(listOf(device("AA", -50)))))
+        val vm = BleScanViewModel(FakeBleScanner(flowOf(listOf(device("AA", -50)))))
         // updateAvailability jamais appelé avec succès -> PermissionRequired
         vm.startScan()
         advanceUntilIdle()
-        assertEquals(ScanUiState.PermissionRequired, vm.uiState.value)
+        assertEquals(BleScanUiState.PermissionRequired, vm.uiState.value)
     }
 
     @Test
     fun `une erreur du scan donne l etat Error`() = runTest {
         val failing = flow<List<BleDevice>> { throw BleScanException(2) }
-        val vm = ScanViewModel(FakeBleScanner(failing))
+        val vm = BleScanViewModel(FakeBleScanner(failing))
         vm.updateAvailability(hasPermissions = true, isBluetoothEnabled = true)
 
         vm.startScan()
         advanceUntilIdle()
 
-        assertTrue(vm.uiState.value is ScanUiState.Error)
+        assertTrue(vm.uiState.value is BleScanUiState.Error)
     }
 
     @Test
     fun `stopScan revient a Idle`() = runTest {
-        val vm = ScanViewModel(FakeBleScanner(flowOf(listOf(device("AA", -50)))))
+        val vm = BleScanViewModel(FakeBleScanner(flowOf(listOf(device("AA", -50)))))
         vm.updateAvailability(hasPermissions = true, isBluetoothEnabled = true)
         vm.startScan()
         advanceUntilIdle()
 
         vm.stopScan()
 
-        assertEquals(ScanUiState.Idle, vm.uiState.value)
+        assertEquals(BleScanUiState.Idle, vm.uiState.value)
     }
 }

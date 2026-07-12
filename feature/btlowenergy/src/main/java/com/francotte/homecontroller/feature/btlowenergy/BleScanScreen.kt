@@ -1,4 +1,4 @@
-package com.francotte.homecontroller.feature.scan
+package com.francotte.homecontroller.feature.btlowenergy
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
@@ -65,10 +65,10 @@ private fun Context.isBluetoothEnabled(): Boolean {
 }
 
 @Composable
-fun ScanScreen(
+fun BleScanScreen(
     onDeviceClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ScanViewModel = hiltViewModel()
+    viewModel: BleScanViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -92,7 +92,7 @@ fun ScanScreen(
 
     Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
         when (val state = uiState) {
-            ScanUiState.PermissionRequired -> StatusScreen(
+            BleScanUiState.PermissionRequired -> StatusScreen(
                 modifier = Modifier.padding(innerPadding),
                 icon = AppIcons.Lock,
                 title = "Permission requise",
@@ -102,7 +102,7 @@ fun ScanScreen(
                 }
             )
 
-            ScanUiState.BluetoothOff -> StatusScreen(
+            BleScanUiState.BluetoothOff -> StatusScreen(
                 modifier = Modifier.padding(innerPadding),
                 icon = AppIcons.BluetoothDisabled,
                 title = "Bluetooth désactivé",
@@ -112,7 +112,7 @@ fun ScanScreen(
                 }
             )
 
-            ScanUiState.Idle -> StatusScreen(
+            BleScanUiState.Idle -> StatusScreen(
                 modifier = Modifier.padding(innerPadding),
                 icon = AppIcons.Bluetooth,
                 title = "Prêt à scanner",
@@ -120,7 +120,7 @@ fun ScanScreen(
                 primaryAction = StatusAction("Démarrer le scan") { viewModel.startScan() }
             )
 
-            is ScanUiState.Scanning ->
+            is BleScanUiState.Scanning ->
                 if (state.devices.isEmpty()) {
                     LoadingState(
                         modifier = Modifier.padding(innerPadding),
@@ -139,7 +139,7 @@ fun ScanScreen(
                     }
                 }
 
-            is ScanUiState.Error -> StatusScreen(
+            is BleScanUiState.Error -> StatusScreen(
                 modifier = Modifier.padding(innerPadding),
                 icon = AppIcons.Warning,
                 title = "Une erreur est survenue",

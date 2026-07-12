@@ -25,7 +25,7 @@ import com.francotte.homecontroller.feature.btclassic.BtClassicScanScreen
 import com.francotte.homecontroller.feature.devicedetail.DeviceControlScreen
 import com.francotte.homecontroller.feature.homeassistant.EntityDetailScreen
 import com.francotte.homecontroller.feature.homeassistant.HomeAssistantScreen
-import com.francotte.homecontroller.feature.scan.ScanScreen
+import com.francotte.homecontroller.feature.btlowenergy.BleScanScreen
 
 private enum class TopTab(val label: String, @DrawableRes val icon: Int) {
     HomeAssistant("Home Assistant", AppIcons.HomeAssistant),
@@ -39,7 +39,7 @@ fun HomeControllerAppShell() {
 
     // Un back stack mémorisé par onglet ; la position de navigation persiste au changement d'onglet.
     val haBackStack = remember { mutableStateListOf<NavKey>(HomeAssistantKey) }
-    val bleBackStack = remember { mutableStateListOf<NavKey>(ScanKey) }
+    val bleBackStack = remember { mutableStateListOf<NavKey>(BleScanKey) }
     val classicBackStack = remember { mutableStateListOf<NavKey>(BtClassicKey) }
     val backStack = when (selected) {
         TopTab.HomeAssistant -> haBackStack
@@ -76,8 +76,8 @@ fun HomeControllerAppShell() {
                         onBack = { haBackStack.removeLastOrNull() }
                     )
                 }
-                entry<ScanKey> {
-                    ScanScreen(onDeviceClick = { address -> bleBackStack.add(DeviceControlKey(address)) })
+                entry<BleScanKey> {
+                    BleScanScreen(onDeviceClick = { address -> bleBackStack.add(DeviceControlKey(address)) })
                 }
                 entry<DeviceControlKey> { key ->
                     DeviceControlScreen(

@@ -1,4 +1,4 @@
-package com.francotte.homecontroller.feature.scan
+package com.francotte.homecontroller.feature.btlowenergy
 
 import com.francotte.homecontroller.core.model.BleDevice
 import kotlin.math.roundToInt

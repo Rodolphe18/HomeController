@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.francotte.homecontroller.feature.scan"
+    namespace = "com.francotte.homecontroller.feature.btlowenergy"
     compileSdk { version = release(37) }
     defaultConfig { minSdk = 26 }
     compileOptions {

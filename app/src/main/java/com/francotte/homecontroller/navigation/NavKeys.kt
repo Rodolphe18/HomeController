@@ -7,7 +7,7 @@ data object HomeAssistantKey : NavKey
 
 data object BtClassicKey : NavKey
 
-data object ScanKey : NavKey
+data object BleScanKey : NavKey
 
 @Immutable
 data class DeviceControlKey(val address: String) : NavKey

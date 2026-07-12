@@ -199,8 +199,8 @@ class HomeAssistantViewModel @Inject constructor(
 
 /** Message utilisateur pour une erreur (typée ou générique). */
 internal fun Throwable.toMessage(): String = when (this) {
-    is HomeAssistantException.Unauthorized -> "Jeton refusé (401). Vérifie le jeton d'accès."
-    is HomeAssistantException.Unreachable -> "Home Assistant injoignable à cette adresse."
-    is HomeAssistantException.NotConfigured -> "Home Assistant n'est pas configuré."
+    is HomeAssistantException.Unauthorized -> "Jeton refusé. Vérifie le jeton d'accès."
+    is HomeAssistantException.Unreachable -> "Home Assistant injoignable. Pensez à activer la connexion wifi de votre appareil"
+    is HomeAssistantException.NotConfigured -> "Home Assistant ne semble pas configuré."
     else -> message ?: "Erreur inconnue."
 }

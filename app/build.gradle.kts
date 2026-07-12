@@ -41,7 +41,7 @@ android {
 
 dependencies {
     implementation(project(":core:designsystem"))
-    implementation(project(":feature:scan"))
+    implementation(project(":feature:btlowenergy"))
     implementation(project(":feature:devicedetail"))
     implementation(project(":feature:homeassistant"))
     implementation(project(":feature:btclassic"))
