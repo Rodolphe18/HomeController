@@ -68,7 +68,7 @@ class BleScanViewModel @Inject constructor(
         if (scanJob != null) return
 
         _uiState.value = BleScanUiState.Scanning(emptyList())
-        val stabilizer = RssiStabilizer()
+        val stabilizer = BleRssiStabilizer()
         scanJob = viewModelScope.launch {
             scanner.scan()
                 .sample(refreshIntervalMs)

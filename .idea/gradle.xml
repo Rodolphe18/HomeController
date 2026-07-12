@@ -21,9 +21,9 @@
             <option value="$PROJECT_DIR$/core/testing" />
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/btclassic" />
+            <option value="$PROJECT_DIR$/feature/btlowenergy" />
             <option value="$PROJECT_DIR$/feature/devicedetail" />
             <option value="$PROJECT_DIR$/feature/homeassistant" />
-            <option value="$PROJECT_DIR$/feature/scan" />
           </set>
         </option>
       </GradleProjectSettings>

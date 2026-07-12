@@ -16,7 +16,7 @@ import kotlin.math.roundToInt
  * @param alpha poids du dernier échantillon dans l'EMA (0..1). Plus il est bas,
  *   plus le lissage est fort (réactivité moindre, stabilité accrue).
  */
-class RssiStabilizer(private val alpha: Double = 0.3) {
+class BleRssiStabilizer(private val alpha: Double = 0.3) {
 
     private val smoothedRssi = LinkedHashMap<String, Double>()
     private val latestDevice = LinkedHashMap<String, BleDevice>()

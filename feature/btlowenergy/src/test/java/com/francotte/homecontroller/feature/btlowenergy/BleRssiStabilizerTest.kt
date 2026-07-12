@@ -4,18 +4,18 @@ import com.francotte.homecontroller.core.model.BleDevice
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class RssiStabilizerTest {
+class BleRssiStabilizerTest {
 
     @Test
     fun `premiere vue utilise le rssi brut`() {
-        val stabilizer = RssiStabilizer()
+        val stabilizer = BleRssiStabilizer()
         val out = stabilizer.update(listOf(BleDevice("AA", "A", -60)))
         assertEquals(-60, out.single().rssi)
     }
 
     @Test
     fun `trie par rssi lisse decroissant`() {
-        val stabilizer = RssiStabilizer()
+        val stabilizer = BleRssiStabilizer()
         val out = stabilizer.update(
             listOf(
                 BleDevice("AA", "A", -80),
@@ -28,7 +28,7 @@ class RssiStabilizerTest {
 
     @Test
     fun `le lissage amortit une valeur aberrante`() {
-        val stabilizer = RssiStabilizer(alpha = 0.3)
+        val stabilizer = BleRssiStabilizer(alpha = 0.3)
         repeat(5) { stabilizer.update(listOf(BleDevice("AA", "A", -60))) } // converge vers -60
         val out = stabilizer.update(listOf(BleDevice("AA", "A", -90)))     // pic isolé
 
@@ -38,7 +38,7 @@ class RssiStabilizerTest {
 
     @Test
     fun `depart stable par adresse a rssi egal`() {
-        val stabilizer = RssiStabilizer()
+        val stabilizer = BleRssiStabilizer()
         val out = stabilizer.update(
             listOf(
                 BleDevice("BB", "B", -50),
@@ -50,7 +50,7 @@ class RssiStabilizerTest {
 
     @Test
     fun `conserve le nom le plus recent`() {
-        val stabilizer = RssiStabilizer()
+        val stabilizer = BleRssiStabilizer()
         stabilizer.update(listOf(BleDevice("AA", null, -60)))
         val out = stabilizer.update(listOf(BleDevice("AA", "NomTardif", -60)))
         assertEquals("NomTardif", out.single().name)
