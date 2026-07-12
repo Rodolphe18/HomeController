@@ -91,7 +91,11 @@ class HomeAssistantViewModel @Inject constructor(
         realtimeGate
     ) { config, s, _ ->
         when {
-            config == null || s.editing -> HomeAssistantUiState.Unconfigured(s.form)
+            config == null || s.editing -> HomeAssistantUiState.Unconfigured(
+                form = s.form,
+                // Annulable seulement s'il y a déjà une config à laquelle revenir (édition).
+                canCancel = config != null
+            )
             s.entities == null -> HomeAssistantUiState.Loading
             else -> HomeAssistantUiState.Entities(
                 items = s.entities,
@@ -131,6 +135,9 @@ class HomeAssistantViewModel @Inject constructor(
     }
 
     fun onEditConfig() = internal.update { it.copy(editing = true) }
+
+    /** Annule l'édition et revient à la liste (sans effet si aucune config n'existe encore). */
+    fun onCancelEdit() = internal.update { it.copy(editing = false, form = ConfigFormState()) }
 
     fun onRefresh() {
         if (internal.value.entities == null) return
@@ -199,8 +206,8 @@ class HomeAssistantViewModel @Inject constructor(
 
 /** Message utilisateur pour une erreur (typée ou générique). */
 internal fun Throwable.toMessage(): String = when (this) {
-    is HomeAssistantException.Unauthorized -> "Jeton refusé. Vérifie le jeton d'accès."
-    is HomeAssistantException.Unreachable -> "Home Assistant injoignable. Pensez à activer la connexion wifi de votre appareil"
-    is HomeAssistantException.NotConfigured -> "Home Assistant ne semble pas configuré."
-    else -> message ?: "Erreur inconnue."
+    is HomeAssistantException.Unauthorized -> "Token rejected. Check your access token."
+    is HomeAssistantException.Unreachable -> "Home Assistant unreachable. Make sure your device's Wi-Fi is on."
+    is HomeAssistantException.NotConfigured -> "Home Assistant doesn't seem to be configured."
+    else -> message ?: "Unknown error."
 }

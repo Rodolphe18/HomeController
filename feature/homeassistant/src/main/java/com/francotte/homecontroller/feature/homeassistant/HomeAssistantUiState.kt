@@ -17,9 +17,16 @@ sealed interface HomeAssistantUiState {
     /** Lecture initiale de la configuration. */
     data object Loading : HomeAssistantUiState
 
-    /** Pas (ou plus) de configuration : on montre le formulaire. */
+    /**
+     * Pas (ou plus) de configuration : on montre le formulaire.
+     * [canCancel] vaut true quand une config existe déjà (édition) : on peut alors annuler
+     * et revenir à la liste ; false lors de la configuration initiale (rien derrière).
+     */
     @Immutable
-    data class Unconfigured(val form: ConfigFormState) : HomeAssistantUiState
+    data class Unconfigured(
+        val form: ConfigFormState,
+        val canCancel: Boolean = false
+    ) : HomeAssistantUiState
 
     /** Configuré : liste des entités commandables. */
     @Immutable
