@@ -4,9 +4,6 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.francotte.homecontroller.core.data.HomeAssistantEntities
-import com.francotte.homecontroller.core.domain.GetControllableEntitiesUseCase
-import com.francotte.homecontroller.core.domain.ObserveEntityStatesUseCase
-import com.francotte.homecontroller.core.domain.SetEntityStateUseCase
 import com.francotte.homecontroller.core.model.EntityRealtimeEvent
 import com.francotte.homecontroller.core.model.EntityStateChange
 import com.francotte.homecontroller.core.model.HomeAssistantEntity

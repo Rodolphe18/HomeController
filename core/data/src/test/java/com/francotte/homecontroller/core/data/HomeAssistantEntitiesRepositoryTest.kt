@@ -1,18 +1,14 @@
 package com.francotte.homecontroller.core.data
 
-import com.francotte.homecontroller.core.datastore.DataSourceHomeAssistantConfiguration
 import com.francotte.homecontroller.core.model.EntityRealtimeEvent
 import com.francotte.homecontroller.core.model.EntityStateChange
 import com.francotte.homecontroller.core.model.HomeAssistantCredentials
-import com.francotte.homecontroller.core.model.HomeAssistantException
 import com.francotte.homecontroller.core.network.HomeAssistantNetworkDataSource
 import com.francotte.homecontroller.core.network.HomeAssistantWebSocketDataSource
 import com.francotte.homecontroller.core.network.NetworkAttributes
 import com.francotte.homecontroller.core.network.NetworkEntityState
 import com.francotte.homecontroller.core.network.WsStateEvent
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
@@ -22,14 +18,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class HomeAssistantEntitiesRepositoryTest {
-
-    private class FakeStore : DataSourceHomeAssistantConfiguration {
-        val flow = MutableStateFlow<HomeAssistantCredentials?>(null)
-        override val credentials: StateFlow<HomeAssistantCredentials?> = flow
-        var saved: HomeAssistantCredentials? = null
-        override suspend fun save(config: HomeAssistantCredentials) { saved = config; flow.value = config }
-        override suspend fun clear() { flow.value = null }
-    }
 
     private class FakeDataSource : HomeAssistantNetworkDataSource {
         var states: List<NetworkEntityState> = emptyList()
@@ -53,9 +41,8 @@ class HomeAssistantEntitiesRepositoryTest {
 
     private fun repo(
         ds: FakeDataSource = FakeDataSource(),
-        ws: FakeWebSocketDataSource = FakeWebSocketDataSource(),
-        store: FakeStore = FakeStore()
-    ) = HomeAssistantEntitiesRepository(ds, ws, store)
+        ws: FakeWebSocketDataSource = FakeWebSocketDataSource()
+    ) = HomeAssistantEntitiesRepository(ds, ws)
 
     @Test
     fun `getControllableEntities filtre light et switch et mappe`() = runTest {
@@ -66,13 +53,13 @@ class HomeAssistantEntitiesRepositoryTest {
                 NetworkEntityState("sensor.temp", "21.5")   // ignoré
             )
         }
-        val result = repo(ds).getControllableEntities()
+        val entities = repo(ds).getControllableEntities().getOrThrow()
 
-        assertEquals(listOf("light.salon", "switch.prise"), result.map { it.entityId })
-        val salon = result.first()
+        assertEquals(listOf("light.salon", "switch.prise"), entities.map { it.entityId })
+        val salon = entities.first()
         assertEquals("Salon", salon.friendlyName)   // friendly_name
         assertTrue(salon.isOn)
-        val prise = result[1]
+        val prise = entities[1]
         assertEquals("switch.prise", prise.friendlyName)  // repli sur entityId
         assertFalse(prise.isOn)
         assertEquals("switch", prise.domain)
@@ -89,10 +76,10 @@ class HomeAssistantEntitiesRepositoryTest {
                 NetworkEntityState("switch.tapo_l535_maj", "off", NetworkAttributes("Tapo L535 MAJ"))
             )
         }
-        val result = repo(ds).getControllableEntities()
+        val entities = repo(ds).getControllableEntities().getOrThrow()
 
         // Seules les entités principales sont gardées ; les auxiliaires (suffixe d'un autre id) tombent.
-        assertEquals(listOf("switch.tapo_p110", "light.tapo_l535"), result.map { it.entityId })
+        assertEquals(listOf("switch.tapo_p110", "light.tapo_l535"), entities.map { it.entityId })
     }
 
     @Test
@@ -107,26 +94,6 @@ class HomeAssistantEntitiesRepositoryTest {
         val ds = FakeDataSource()
         repo(ds).setEntityState("switch.prise", false)
         assertEquals(Triple("switch", "turn_off", "switch.prise"), ds.serviceCalls.single())
-    }
-
-    @Test
-    fun `testConnection succes donne Result success`() = runTest {
-        val result = repo().testConnection(HomeAssistantCredentials("http://x:8123", "t"))
-        assertTrue(result.isSuccess)
-    }
-
-    @Test
-    fun `testConnection echec porte l exception`() = runTest {
-        val ds = FakeDataSource().apply { testError = HomeAssistantException.Unauthorized }
-        val result = repo(ds).testConnection(HomeAssistantCredentials("http://x:8123", "bad"))
-        assertTrue(result.exceptionOrNull() is HomeAssistantException.Unauthorized)
-    }
-
-    @Test
-    fun `saveConfig delegue au store`() = runTest {
-        val store = FakeStore()
-        repo(store = store).saveConfig(HomeAssistantCredentials("http://x:8123", "t"))
-        assertEquals("http://x:8123", store.saved?.baseUrl)
     }
 
     @Test

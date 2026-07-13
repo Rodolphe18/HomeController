@@ -6,7 +6,7 @@ import okhttp3.Response
 import javax.inject.Inject
 
 internal class HomeAssistantAuthInterceptor @Inject constructor(
-    private val provider: HomeAssistantConfigProvider
+    private val provider: HomeAssistantConfigurationProvider
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val config = provider.current() ?: throw HomeAssistantException.NotConfigured

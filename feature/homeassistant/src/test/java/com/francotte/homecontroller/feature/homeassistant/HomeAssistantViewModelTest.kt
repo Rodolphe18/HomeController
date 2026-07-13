@@ -1,6 +1,5 @@
 package com.francotte.homecontroller.feature.homeassistant
 
-import com.francotte.homecontroller.core.domain.ObserveConfigUseCase
 import com.francotte.homecontroller.core.model.HomeAssistantCredentials
 import com.francotte.homecontroller.core.testing.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,15 +22,15 @@ class HomeAssistantViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     // uiState est en WhileSubscribed : on maintient un abonné pour la durée du test.
-    private fun TestScope.activeVm(repo: FakeHomeAssistantRepository): HomeAssistantViewModel {
-        val model = HomeAssistantViewModel(ObserveConfigUseCase(repo))
+    private fun TestScope.activeVm(config: FakeHomeAssistantConfiguration): HomeAssistantViewModel {
+        val model = HomeAssistantViewModel(config)
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { model.uiState.collect {} }
         return model
     }
 
     @Test
     fun `sans config affiche Unconfigured non annulable`() = runTest {
-        val model = activeVm(FakeHomeAssistantRepository())
+        val model = activeVm(FakeHomeAssistantConfiguration())
         advanceUntilIdle()
         val state = model.uiState.value
         assertTrue(state is HomeAssistantUiState.Unconfigured)
@@ -40,20 +39,20 @@ class HomeAssistantViewModelTest {
 
     @Test
     fun `avec config affiche Entities`() = runTest {
-        val repo = FakeHomeAssistantRepository().apply {
-            configFlow.value = HomeAssistantCredentials("http://x:8123", "t")
+        val config = FakeHomeAssistantConfiguration().apply {
+            credentialsFlow.value = HomeAssistantCredentials("http://x:8123", "t")
         }
-        val model = activeVm(repo)
+        val model = activeVm(config)
         advanceUntilIdle()
         assertEquals(HomeAssistantUiState.Entities, model.uiState.value)
     }
 
     @Test
     fun `onEditConfig avec config affiche Unconfigured annulable`() = runTest {
-        val repo = FakeHomeAssistantRepository().apply {
-            configFlow.value = HomeAssistantCredentials("http://x:8123", "t")
+        val config = FakeHomeAssistantConfiguration().apply {
+            credentialsFlow.value = HomeAssistantCredentials("http://x:8123", "t")
         }
-        val model = activeVm(repo)
+        val model = activeVm(config)
         advanceUntilIdle()
         model.navigateToConfigurationScreen()
         advanceUntilIdle()
@@ -64,10 +63,10 @@ class HomeAssistantViewModelTest {
 
     @Test
     fun `onCancelEdit revient sur Entities`() = runTest {
-        val repo = FakeHomeAssistantRepository().apply {
-            configFlow.value = HomeAssistantCredentials("http://x:8123", "t")
+        val config = FakeHomeAssistantConfiguration().apply {
+            credentialsFlow.value = HomeAssistantCredentials("http://x:8123", "t")
         }
-        val model = activeVm(repo)
+        val model = activeVm(config)
         advanceUntilIdle()
         model.navigateToConfigurationScreen()
         advanceUntilIdle()
@@ -78,10 +77,10 @@ class HomeAssistantViewModelTest {
 
     @Test
     fun `onConfigurationSaved revient sur Entities`() = runTest {
-        val repo = FakeHomeAssistantRepository().apply {
-            configFlow.value = HomeAssistantCredentials("http://x:8123", "t")
+        val config = FakeHomeAssistantConfiguration().apply {
+            credentialsFlow.value = HomeAssistantCredentials("http://x:8123", "t")
         }
-        val model = activeVm(repo)
+        val model = activeVm(config)
         advanceUntilIdle()
         model.navigateToConfigurationScreen()
         advanceUntilIdle()

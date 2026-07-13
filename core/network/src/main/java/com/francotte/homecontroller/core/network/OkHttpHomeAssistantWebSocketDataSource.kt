@@ -24,7 +24,7 @@ import javax.inject.Inject
  * qui réécrirait le schéma ws:// en http://).
  */
 internal class OkHttpHomeAssistantWebSocketDataSource @Inject constructor(
-    private val configProvider: HomeAssistantConfigProvider,
+    private val configProvider: HomeAssistantConfigurationProvider,
     private val json: Json
 ) : HomeAssistantWebSocketDataSource {
 

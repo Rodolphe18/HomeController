@@ -1,10 +1,5 @@
 package com.francotte.homecontroller.feature.homeassistant
 
-import com.francotte.homecontroller.core.data.HomeAssistantRepository
-import com.francotte.homecontroller.core.domain.GetEntityDetailUseCase
-import com.francotte.homecontroller.core.domain.ObserveEntityStatesUseCase
-import com.francotte.homecontroller.core.domain.SetBrightnessUseCase
-import com.francotte.homecontroller.core.domain.SetEntityStateUseCase
 import com.francotte.homecontroller.core.model.EntityDetail
 import com.francotte.homecontroller.core.model.EntityRealtimeEvent
 import com.francotte.homecontroller.core.model.EntityStateChange
@@ -28,15 +23,10 @@ class EntityDetailViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private fun vm(repo: HomeAssistantRepository, entityId: String = "light.a") = EntityDetailViewModel(
-        entityId = entityId,
-        getEntityDetail = GetEntityDetailUseCase(repo),
-        setBrightness = SetBrightnessUseCase(repo),
-        setEntityState = SetEntityStateUseCase(repo),
-        observeEntityStates = ObserveEntityStatesUseCase(repo)
-    )
+    private fun vm(repo: FakeHomeAssistantEntities, entityId: String = "light.a") =
+        EntityDetailViewModel(entityId = entityId, homeAssistantEntities = repo)
 
-    private fun TestScope.activeVm(repo: HomeAssistantRepository, entityId: String = "light.a"): EntityDetailViewModel {
+    private fun TestScope.activeVm(repo: FakeHomeAssistantEntities, entityId: String = "light.a"): EntityDetailViewModel {
         val model = vm(repo, entityId)
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { model.uiState.collect {} }
         return model
@@ -47,7 +37,7 @@ class EntityDetailViewModelTest {
 
     @Test
     fun `chargement expose Content`() = runTest {
-        val repo = FakeHomeAssistantRepository().apply { detail = lightDetail(isOn = true, pct = 30) }
+        val repo = FakeHomeAssistantEntities().apply { detail = lightDetail(isOn = true, pct = 30) }
         val model = activeVm(repo)
         advanceUntilIdle()
         val state = model.uiState.value as EntityDetailUiState.Content
@@ -58,7 +48,7 @@ class EntityDetailViewModelTest {
 
     @Test
     fun `chargement en echec expose Error`() = runTest {
-        val repo = FakeHomeAssistantRepository().apply { detailError = RuntimeException("boom") }
+        val repo = FakeHomeAssistantEntities().apply { detailError = RuntimeException("boom") }
         val model = activeVm(repo)
         advanceUntilIdle()
         assertTrue(model.uiState.value is EntityDetailUiState.Error)
@@ -66,7 +56,7 @@ class EntityDetailViewModelTest {
 
     @Test
     fun `drag met a jour l affichage sans envoi`() = runTest {
-        val repo = FakeHomeAssistantRepository().apply { detail = lightDetail(pct = 30) }
+        val repo = FakeHomeAssistantEntities().apply { detail = lightDetail(pct = 30) }
         val model = activeVm(repo)
         advanceUntilIdle()
         model.onBrightnessDrag(70)
@@ -78,7 +68,7 @@ class EntityDetailViewModelTest {
 
     @Test
     fun `commit positif envoie turn_on et optimiste allume`() = runTest {
-        val repo = FakeHomeAssistantRepository().apply { detail = lightDetail(isOn = false, pct = 0) }
+        val repo = FakeHomeAssistantEntities().apply { detail = lightDetail(isOn = false, pct = 0) }
         val model = activeVm(repo)
         advanceUntilIdle()
         model.onBrightnessCommit(60)
@@ -91,7 +81,7 @@ class EntityDetailViewModelTest {
 
     @Test
     fun `commit a zero envoie et optimiste eteint`() = runTest {
-        val repo = FakeHomeAssistantRepository().apply { detail = lightDetail(isOn = true, pct = 40) }
+        val repo = FakeHomeAssistantEntities().apply { detail = lightDetail(isOn = true, pct = 40) }
         val model = activeVm(repo)
         advanceUntilIdle()
         model.onBrightnessCommit(0)
@@ -103,7 +93,7 @@ class EntityDetailViewModelTest {
 
     @Test
     fun `echec de commit restaure l etat precedent`() = runTest {
-        val repo = FakeHomeAssistantRepository().apply {
+        val repo = FakeHomeAssistantEntities().apply {
             detail = lightDetail(isOn = true, pct = 30)
             setBrightnessError = RuntimeException("réseau")
         }
@@ -119,7 +109,7 @@ class EntityDetailViewModelTest {
 
     @Test
     fun `changement temps reel applique hors drag`() = runTest {
-        val repo = FakeHomeAssistantRepository().apply { detail = lightDetail(isOn = true, pct = 30) }
+        val repo = FakeHomeAssistantEntities().apply { detail = lightDetail(isOn = true, pct = 30) }
         val model = activeVm(repo)
         advanceUntilIdle()
         repo.emitRealtime(EntityRealtimeEvent.Changed(EntityStateChange("light.a", true, "on", 80)))
@@ -130,7 +120,7 @@ class EntityDetailViewModelTest {
 
     @Test
     fun `changement temps reel ignore pendant le drag`() = runTest {
-        val repo = FakeHomeAssistantRepository().apply { detail = lightDetail(isOn = true, pct = 30) }
+        val repo = FakeHomeAssistantEntities().apply { detail = lightDetail(isOn = true, pct = 30) }
         val model = activeVm(repo)
         advanceUntilIdle()
         model.onBrightnessDrag(50)
@@ -142,7 +132,7 @@ class EntityDetailViewModelTest {
 
     @Test
     fun `resync recharge le detail`() = runTest {
-        val repo = FakeHomeAssistantRepository().apply { detail = lightDetail(isOn = false, pct = 0) }
+        val repo = FakeHomeAssistantEntities().apply { detail = lightDetail(isOn = false, pct = 0) }
         val model = activeVm(repo)
         advanceUntilIdle()
         repo.detail = lightDetail(isOn = true, pct = 90)

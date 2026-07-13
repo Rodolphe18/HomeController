@@ -3,10 +3,7 @@ package com.francotte.homecontroller.feature.homeassistant
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.francotte.homecontroller.core.domain.GetEntityDetailUseCase
-import com.francotte.homecontroller.core.domain.ObserveEntityStatesUseCase
-import com.francotte.homecontroller.core.domain.SetBrightnessUseCase
-import com.francotte.homecontroller.core.domain.SetEntityStateUseCase
+import com.francotte.homecontroller.core.data.HomeAssistantEntities
 import com.francotte.homecontroller.core.model.EntityDetail
 import com.francotte.homecontroller.core.model.EntityRealtimeEvent
 import com.francotte.homecontroller.core.model.EntityStateChange
@@ -29,10 +26,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = EntityDetailViewModel.Factory::class)
 class EntityDetailViewModel @AssistedInject constructor(
     @Assisted private val entityId: String,
-    private val getEntityDetail: GetEntityDetailUseCase,
-    private val setBrightness: SetBrightnessUseCase,
-    private val setEntityState: SetEntityStateUseCase,
-    private val observeEntityStates: ObserveEntityStatesUseCase
+    private val homeAssistantEntities: HomeAssistantEntities
 ) : ViewModel() {
 
     @AssistedFactory
@@ -50,7 +44,7 @@ class EntityDetailViewModel @AssistedInject constructor(
     private val internal = MutableStateFlow(Internal())
 
     // Temps réel filtré sur cette entité, fondu dans le pipeline pour vivre le temps de l'écran.
-    private val realtimeGate: Flow<Unit> = observeEntityStates()
+    private val realtimeGate: Flow<Unit> = homeAssistantEntities.observeEntityStates()
         .onEach { event ->
             when (event) {
                 EntityRealtimeEvent.Resync -> loadDetail()
@@ -94,7 +88,7 @@ class EntityDetailViewModel @AssistedInject constructor(
         }
         viewModelScope.launch {
             try {
-                setBrightness(entityId, p)
+                homeAssistantEntities.setBrightness(entityId, p)
             } catch (t: Throwable) {
                 internal.update { it.copy(detail = previous, transientError = t.toMessageRes()) }
             }
@@ -106,7 +100,7 @@ class EntityDetailViewModel @AssistedInject constructor(
         internal.update { it.copy(detail = it.detail?.copy(isOn = on), transientError = null) }
         viewModelScope.launch {
             try {
-                setEntityState(entityId, on)
+                homeAssistantEntities.setEntityState(entityId, on)
             } catch (t: Throwable) {
                 internal.update { it.copy(detail = previous, transientError = t.toMessageRes()) }
             }
@@ -115,7 +109,7 @@ class EntityDetailViewModel @AssistedInject constructor(
 
     private suspend fun loadDetail() {
         try {
-            val d = getEntityDetail(entityId)
+            val d = homeAssistantEntities.getEntityDetail(entityId)
             internal.update { it.copy(detail = d, loadError = null) }
         } catch (t: Throwable) {
             internal.update { it.copy(loadError = t.toMessageRes()) }

@@ -3,7 +3,7 @@ package com.francotte.homecontroller.feature.homeassistant
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.francotte.homecontroller.core.domain.ObserveConfigUseCase
+import com.francotte.homecontroller.core.data.HomeAssistantConfiguration
 import com.francotte.homecontroller.core.model.HomeAssistantException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,14 +22,14 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class HomeAssistantViewModel @Inject constructor(
-    observeConfig: ObserveConfigUseCase
+    homeAssistantConfiguration: HomeAssistantConfiguration
 ) : ViewModel() {
 
     /** Édition d'une config existante, demandée depuis l'écran des entités (bouton réglages). */
     private val editing = MutableStateFlow(false)
 
     val uiState: StateFlow<HomeAssistantUiState> = combine(
-        observeConfig(),
+        homeAssistantConfiguration.credentials,
         editing
     ) { config, editing ->
         when {
