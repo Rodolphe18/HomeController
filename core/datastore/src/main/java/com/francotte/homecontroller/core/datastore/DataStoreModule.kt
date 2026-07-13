@@ -9,5 +9,5 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 internal abstract class DataStoreModule {
     @Binds
-    abstract fun bindConfigStore(impl: DataStoreHomeAssistantConfiguration): HomeAssistantConfiguration
+    abstract fun bindConfigStore(impl: DataStoreDataSourceHomeAssistantConfiguration): DataSourceHomeAssistantConfiguration
 }

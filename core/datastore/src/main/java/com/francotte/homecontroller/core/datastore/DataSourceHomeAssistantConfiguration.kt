@@ -1,12 +1,12 @@
 package com.francotte.homecontroller.core.datastore
 
-import com.francotte.homecontroller.core.model.HomeAssistantConfig
+import com.francotte.homecontroller.core.model.HomeAssistantCredentials
 import kotlinx.coroutines.flow.StateFlow
 
 /** Stockage sécurisé de la configuration Home Assistant. */
-interface HomeAssistantConfiguration {
+interface DataSourceHomeAssistantConfiguration {
     /** Config courante (null = pas encore configuré). StateFlow → lecture synchrone via `.value`. */
-    val configuration: StateFlow<HomeAssistantConfig?>
-    suspend fun save(config: HomeAssistantConfig)
+    val credentials: StateFlow<HomeAssistantCredentials?>
+    suspend fun save(config: HomeAssistantCredentials)
     suspend fun clear()
 }

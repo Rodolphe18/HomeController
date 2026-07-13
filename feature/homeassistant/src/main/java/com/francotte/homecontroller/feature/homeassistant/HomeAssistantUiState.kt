@@ -3,37 +3,45 @@ package com.francotte.homecontroller.feature.homeassistant
 import androidx.compose.runtime.Immutable
 import com.francotte.homecontroller.core.model.HomeAssistantEntity
 
-/** État de formulaire de configuration. */
+/** État du formulaire de configuration — porté par [HomeAssistantConfigurationViewModel]. */
 @Immutable
-data class ConfigFormState(
+data class ConfigurationFormState(
     val url: String = "",
     val token: String = "",
     val isTesting: Boolean = false,
     val error: String? = null
 )
 
-/** État de l'écran Home Assistant. */
+/**
+ * État « aiguilleur » du parcours Home Assistant, produit par [HomeAssistantViewModel].
+ * Il ne décide QUE de l'écran à afficher ; le contenu de chaque écran vit dans son propre VM.
+ */
 sealed interface HomeAssistantUiState {
     /** Lecture initiale de la configuration. */
     data object Loading : HomeAssistantUiState
 
     /**
-     * Pas (ou plus) de configuration : on montre le formulaire.
-     * [canCancel] vaut true quand une config existe déjà (édition) : on peut alors annuler
-     * et revenir à la liste ; false lors de la configuration initiale (rien derrière).
+     * Écran de configuration. [canCancel] vaut true en édition (une config existe déjà : on peut
+     * annuler et revenir à la liste) ; false lors de la configuration initiale (rien derrière).
      */
     @Immutable
-    data class Unconfigured(
-        val form: ConfigFormState,
-        val canCancel: Boolean = false
-    ) : HomeAssistantUiState
+    data class Unconfigured(val canCancel: Boolean = false) : HomeAssistantUiState
 
-    /** Configuré : liste des entités commandables. */
+    /** Écran des entités commandables. */
+    data object Entities : HomeAssistantUiState
+}
+
+/** État de l'écran des entités — porté par [HomeAssistantEntitiesViewModel]. */
+sealed interface EntitiesUiState {
+    /** Chargement initial de la liste. */
+    data object Loading : EntitiesUiState
+
+    /** Liste chargée (éventuellement vide), avec état de refresh et erreurs éventuelles. */
     @Immutable
-    data class Entities(
+    data class Content(
         val items: List<HomeAssistantEntity>,
         val isRefreshing: Boolean = false,
         val listError: String? = null,
         val transientError: String? = null
-    ) : HomeAssistantUiState
+    ) : EntitiesUiState
 }

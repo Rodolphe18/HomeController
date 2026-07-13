@@ -3,15 +3,15 @@ package com.francotte.homecontroller.feature.homeassistant
 import com.francotte.homecontroller.core.data.HomeAssistantRepository
 import com.francotte.homecontroller.core.model.EntityDetail
 import com.francotte.homecontroller.core.model.EntityRealtimeEvent
-import com.francotte.homecontroller.core.model.HomeAssistantConfig
+import com.francotte.homecontroller.core.model.HomeAssistantCredentials
 import com.francotte.homecontroller.core.model.HomeAssistantEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class FakeHomeAssistantRepository : HomeAssistantRepository {
-    val configFlow = MutableStateFlow<HomeAssistantConfig?>(null)
-    override val config: Flow<HomeAssistantConfig?> = configFlow
+    val configFlow = MutableStateFlow<HomeAssistantCredentials?>(null)
+    override val config: Flow<HomeAssistantCredentials?> = configFlow
 
     var entities: List<HomeAssistantEntity> = emptyList()
     var entitiesError: Throwable? = null
@@ -19,12 +19,10 @@ class FakeHomeAssistantRepository : HomeAssistantRepository {
     var setError: Throwable? = null
     val toggles = mutableListOf<Pair<String, Boolean>>()
 
-    override suspend fun saveConfig(config: HomeAssistantConfig) { configFlow.value = config }
-    override suspend fun testConnection(config: HomeAssistantConfig): Result<Unit> = testResult
-    override suspend fun getControllableEntities(): List<HomeAssistantEntity> {
-        entitiesError?.let { throw it }
-        return entities
-    }
+    override suspend fun saveConfig(config: HomeAssistantCredentials) { configFlow.value = config }
+    override suspend fun testConnection(config: HomeAssistantCredentials): Result<Unit> = testResult
+    override suspend fun getControllableEntities(): Result<List<HomeAssistantEntity>> =
+        entitiesError?.let { Result.failure(it) } ?: Result.success(entities)
     override suspend fun setEntityState(entityId: String, on: Boolean) {
         toggles.add(entityId to on)
         setError?.let { throw it }   // échec : l'état HA ne change pas

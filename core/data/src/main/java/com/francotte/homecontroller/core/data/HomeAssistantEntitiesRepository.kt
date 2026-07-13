@@ -1,10 +1,8 @@
 package com.francotte.homecontroller.core.data
 
-import com.francotte.homecontroller.core.datastore.HomeAssistantConfiguration
 import com.francotte.homecontroller.core.model.EntityDetail
 import com.francotte.homecontroller.core.model.EntityRealtimeEvent
 import com.francotte.homecontroller.core.model.EntityStateChange
-import com.francotte.homecontroller.core.model.HomeAssistantConfig
 import com.francotte.homecontroller.core.model.HomeAssistantEntity
 import com.francotte.homecontroller.core.model.HomeAssistantException
 import com.francotte.homecontroller.core.network.HomeAssistantNetworkDataSource
@@ -18,31 +16,21 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.retryWhen
 import javax.inject.Inject
 
-internal class DefaultHomeAssistantRepository @Inject constructor(
+internal class HomeAssistantEntitiesRepository @Inject constructor(
     private val networkDataSource: HomeAssistantNetworkDataSource,
-    private val webSocketDataSource: HomeAssistantWebSocketDataSource,
-    private val store: HomeAssistantConfiguration
-) : HomeAssistantRepository {
+    private val webSocketDataSource: HomeAssistantWebSocketDataSource
+) : HomeAssistantEntities {
 
-    override val config: Flow<HomeAssistantConfig?> = store.configuration
 
-    override suspend fun saveConfig(config: HomeAssistantConfig) = store.save(config)
-
-    override suspend fun testConnection(config: HomeAssistantConfig): Result<Unit> =
-        runCatching { networkDataSource.testConnection(config) }
-
-    override suspend fun getControllableEntities(): List<HomeAssistantEntity> {
+    override suspend fun getControllableEntities(): Result<List<HomeAssistantEntity>> = runCatching {
         val states = networkDataSource.getStates()
-        // Filtre heuristique (REST pur, sans WebSocket) : on ne garde que l'entité de contrôle
-        // principale de chaque appareil. Les entités auxiliaires (LED, arrêt auto, mise à jour…)
-        // ont un object_id qui ÉTEND celui de la principale — ex. "tapo_p110_led" étend
-        // "tapo_p110". On masque donc toute entité dont l'object_id prolonge celui d'une autre.
+
         val objectIds = states.map { it.entityId.substringAfter(".") }.toSet()
-        return states
+        states
             .filter { it.entityId.substringBefore(".") in CONTROLLABLE }
-            .filterNot { state ->
+            .filter { state ->
                 val objectId = state.entityId.substringAfter(".")
-                objectIds.any { other -> other != objectId && objectId.startsWith("${other}_") }
+                objectIds.none { other -> objectId.startsWith("${other}_") }
             }
             .map { it.toDomain() }
     }
@@ -118,3 +106,4 @@ internal class DefaultHomeAssistantRepository @Inject constructor(
         const val MAX_BACKOFF_MS = 30_000L
     }
 }
+

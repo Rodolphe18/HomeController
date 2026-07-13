@@ -9,30 +9,22 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -43,6 +35,7 @@ import com.francotte.homecontroller.core.designsystem.component.LoadingState
 import com.francotte.homecontroller.core.designsystem.component.StatusAction
 import com.francotte.homecontroller.core.designsystem.component.StatusScreen
 import com.francotte.homecontroller.core.model.BleDevice
+import com.francotte.homecontroller.core.ui.BleDeviceCard
 
 /** Permissions runtime à demander, selon la version Android. */
 private fun requiredScanPermissions(): Array<String> =
@@ -162,50 +155,7 @@ fun BleScanScreen(
 private fun DeviceList(devices: List<BleDevice>, onDeviceClick: (String) -> Unit) {
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         items(devices, key = { it.address }) { device ->
-            DeviceRow(device, onClick = { onDeviceClick(device.address) })
+            BleDeviceCard(device, onClick = { onDeviceClick(device.address) })
         }
     }
-}
-
-@Composable
-private fun DeviceRow(device: BleDevice, onClick: () -> Unit) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-        ),
-        shape = MaterialTheme.shapes.large,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = device.name ?: "Inconnu",
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(text = device.address, style = MaterialTheme.typography.bodySmall)
-            }
-            RssiBadge("${device.rssi} dBm")
-        }
-    }
-}
-
-@Composable
-private fun RssiBadge(text: String) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.onTertiaryContainer,
-        modifier = Modifier
-            .clip(MaterialTheme.shapes.small)
-            .background(MaterialTheme.colorScheme.tertiaryContainer)
-            .padding(horizontal = 10.dp, vertical = 6.dp)
-    )
 }

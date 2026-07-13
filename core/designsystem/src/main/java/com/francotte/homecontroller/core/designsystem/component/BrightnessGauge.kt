@@ -1,4 +1,4 @@
-package com.francotte.homecontroller.feature.homeassistant
+package com.francotte.homecontroller.core.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -30,9 +30,9 @@ fun brightnessFromOffset(pointerY: Float, gaugeHeightPx: Float): Int =
     else (((gaugeHeightPx - pointerY) / gaugeHeightPx) * 100f).roundToInt().coerceIn(0, 100)
 
 /**
- * Jauge verticale de luminosité, remplie depuis le bas. Manipulation directe : la position
- * du doigt fixe le niveau. Pendant le glissement → [onValueChange] (affichage) ; à la levée
- * du doigt → [onValueChangeFinished] (envoi).
+ * Jauge verticale remplie depuis le bas. Manipulation directe : la position du doigt fixe le
+ * niveau. Pendant le glissement → [onValueChange] (affichage) ; à la levée du doigt →
+ * [onValueChangeFinished] (envoi). Atome de design system : ne prend qu'un pourcentage (Int).
  */
 @Composable
 fun BrightnessGauge(

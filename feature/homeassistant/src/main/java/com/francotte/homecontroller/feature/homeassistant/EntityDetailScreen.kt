@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.francotte.homecontroller.core.designsystem.AppIcons
+import com.francotte.homecontroller.core.designsystem.component.BrightnessGauge
 import com.francotte.homecontroller.core.designsystem.component.LoadingState
 import com.francotte.homecontroller.core.designsystem.component.StatusAction
 import com.francotte.homecontroller.core.designsystem.component.StatusScreen

@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.francotte.homecontroller.core.model.HomeAssistantConfig
+import com.francotte.homecontroller.core.model.HomeAssistantCredentials
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,17 +20,17 @@ import javax.inject.Singleton
 private val Context.configurationDataStore: DataStore<Preferences> by preferencesDataStore(name = "home_assistant_config")
 
 @Singleton
-internal class DataStoreHomeAssistantConfiguration @Inject constructor(
+internal class DataStoreDataSourceHomeAssistantConfiguration @Inject constructor(
     @ApplicationContext context: Context
-) : HomeAssistantConfiguration {
+) : DataSourceHomeAssistantConfiguration {
 
     private val dataStore = context.configurationDataStore
 
     // Seed synchrone (lecture unique, petite) pour offrir un `.value` à l'interceptor réseau.
     private val _configuration = MutableStateFlow(runBlocking { read() })
-    override val configuration: StateFlow<HomeAssistantConfig?> = _configuration.asStateFlow()
+    override val credentials: StateFlow<HomeAssistantCredentials?> = _configuration.asStateFlow()
 
-    override suspend fun save(config: HomeAssistantConfig) {
+    override suspend fun save(config: HomeAssistantCredentials) {
         val sealed = TokenCrypto.encrypt(config.token)
         dataStore.edit { prefs ->
             prefs[KEY_URL] = config.baseUrl
@@ -45,14 +45,14 @@ internal class DataStoreHomeAssistantConfiguration @Inject constructor(
         _configuration.value = null
     }
 
-    private suspend fun read(): HomeAssistantConfig? {
+    private suspend fun read(): HomeAssistantCredentials? {
         val prefs = dataStore.data.first()
         val url = prefs[KEY_URL] ?: return null
         val cipher = prefs[KEY_TOKEN_CIPHER] ?: return null
         val iv = prefs[KEY_TOKEN_IV] ?: return null
         // Si la clé Keystore a disparu (restauration sur un autre appareil…), on repart non configuré.
         return runCatching {
-            HomeAssistantConfig(url, TokenCrypto.decrypt(iv.fromBase64(), cipher.fromBase64()))
+            HomeAssistantCredentials(url, TokenCrypto.decrypt(iv.fromBase64(), cipher.fromBase64()))
         }.getOrNull()
     }
 

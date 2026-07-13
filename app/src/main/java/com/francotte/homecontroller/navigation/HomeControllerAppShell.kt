@@ -42,7 +42,7 @@ private enum class TopTab(
     @DrawableRes val icon: Int,
     @DrawableRes val selectedIcon: Int = icon
 ) {
-    HomeAssistant("Maison", AppIcons.HomeAssistant, AppIcons.HomeFilled),
+    HomeAssistant("Home Assistant", AppIcons.HomeAssistant, AppIcons.HomeFilled),
     Ble("BLE", AppIcons.Ble),
     BtClassic("Classic", AppIcons.BtClassic)
 }

@@ -1,5 +1,6 @@
 package com.francotte.homecontroller.feature.homeassistant
 
+import com.francotte.homecontroller.core.designsystem.component.brightnessFromOffset
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

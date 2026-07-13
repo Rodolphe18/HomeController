@@ -9,7 +9,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,8 +22,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -34,7 +31,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -44,6 +40,7 @@ import com.francotte.homecontroller.core.designsystem.AppIcons
 import com.francotte.homecontroller.core.designsystem.component.StatusAction
 import com.francotte.homecontroller.core.designsystem.component.StatusScreen
 import com.francotte.homecontroller.core.model.BtClassicDevice
+import com.francotte.homecontroller.core.ui.BtClassicDeviceCard
 
 /** Permissions runtime selon la version Android (mêmes que le scan BLE). */
 private fun requiredScanPermissions(): Array<String> =
@@ -185,11 +182,11 @@ private fun DeviceList(devices: List<BtClassicDevice>) {
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         if (paired.isNotEmpty()) {
             item(key = "header_paired") { SectionHeader("Appairés") }
-            items(paired, key = { it.address }) { device -> DeviceRow(device) }
+            items(paired, key = { it.address }) { device -> BtClassicDeviceCard(device) }
         }
         if (discovered.isNotEmpty()) {
             item(key = "header_discovered") { SectionHeader("Découverts") }
-            items(discovered, key = { it.address }) { device -> DeviceRow(device) }
+            items(discovered, key = { it.address }) { device -> BtClassicDeviceCard(device) }
         }
     }
 }
@@ -202,43 +199,4 @@ private fun SectionHeader(title: String) {
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
     )
-}
-
-@Composable
-private fun DeviceRow(device: BtClassicDevice) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-        ),
-        shape = MaterialTheme.shapes.large,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(device.name ?: "Inconnu", style = MaterialTheme.typography.titleMedium)
-                Text(device.address, style = MaterialTheme.typography.bodySmall)
-                Text(
-                    text = device.rssi?.let { "$it dBm" } ?: "— dBm",
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-            if (device.bonded) {
-                Text(
-                    text = "Appairé",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    modifier = Modifier
-                        .clip(MaterialTheme.shapes.small)
-                        .background(MaterialTheme.colorScheme.secondaryContainer)
-                        .padding(horizontal = 10.dp, vertical = 6.dp)
-                )
-            }
-        }
-    }
 }

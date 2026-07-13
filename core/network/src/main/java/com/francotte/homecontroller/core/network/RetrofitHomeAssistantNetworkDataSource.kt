@@ -1,6 +1,6 @@
 package com.francotte.homecontroller.core.network
 
-import com.francotte.homecontroller.core.model.HomeAssistantConfig
+import com.francotte.homecontroller.core.model.HomeAssistantCredentials
 import com.francotte.homecontroller.core.model.HomeAssistantException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -26,7 +26,7 @@ internal class RetrofitHomeAssistantNetworkDataSource @Inject constructor(
     override suspend fun callService(domain: String, service: String, entityId: String, brightnessPct: Int?) =
         call { api.callService(domain, service, NetworkServiceCall(entityId, brightnessPct)) }
 
-    override suspend fun testConnection(config: HomeAssistantConfig) = withContext(Dispatchers.IO) {
+    override suspend fun testConnection(config: HomeAssistantCredentials) = withContext(Dispatchers.IO) {
         val url = config.baseUrl.trimEnd('/') + "/api/"
         val request = Request.Builder()
             .url(url)

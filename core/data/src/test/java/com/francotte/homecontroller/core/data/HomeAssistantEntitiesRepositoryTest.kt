@@ -1,10 +1,9 @@
 package com.francotte.homecontroller.core.data
 
-import com.francotte.homecontroller.core.datastore.HomeAssistantConfiguration
-import com.francotte.homecontroller.core.model.EntityDetail
+import com.francotte.homecontroller.core.datastore.DataSourceHomeAssistantConfiguration
 import com.francotte.homecontroller.core.model.EntityRealtimeEvent
 import com.francotte.homecontroller.core.model.EntityStateChange
-import com.francotte.homecontroller.core.model.HomeAssistantConfig
+import com.francotte.homecontroller.core.model.HomeAssistantCredentials
 import com.francotte.homecontroller.core.model.HomeAssistantException
 import com.francotte.homecontroller.core.network.HomeAssistantNetworkDataSource
 import com.francotte.homecontroller.core.network.HomeAssistantWebSocketDataSource
@@ -22,13 +21,13 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class DefaultHomeAssistantRepositoryTest {
+class HomeAssistantEntitiesRepositoryTest {
 
-    private class FakeStore : HomeAssistantConfiguration {
-        val flow = MutableStateFlow<HomeAssistantConfig?>(null)
-        override val configuration: StateFlow<HomeAssistantConfig?> = flow
-        var saved: HomeAssistantConfig? = null
-        override suspend fun save(config: HomeAssistantConfig) { saved = config; flow.value = config }
+    private class FakeStore : DataSourceHomeAssistantConfiguration {
+        val flow = MutableStateFlow<HomeAssistantCredentials?>(null)
+        override val credentials: StateFlow<HomeAssistantCredentials?> = flow
+        var saved: HomeAssistantCredentials? = null
+        override suspend fun save(config: HomeAssistantCredentials) { saved = config; flow.value = config }
         override suspend fun clear() { flow.value = null }
     }
 
@@ -38,7 +37,7 @@ class DefaultHomeAssistantRepositoryTest {
         var testError: Throwable? = null
         val serviceCalls = mutableListOf<Triple<String, String, String>>()
         var lastBrightnessPct: Int? = null
-        override suspend fun testConnection(config: HomeAssistantConfig) { testError?.let { throw it } }
+        override suspend fun testConnection(config: HomeAssistantCredentials) { testError?.let { throw it } }
         override suspend fun getStates(): List<NetworkEntityState> = states
         override suspend fun getState(entityId: String): NetworkEntityState = stateResult
         override suspend fun callService(domain: String, service: String, entityId: String, brightnessPct: Int?) {
@@ -56,7 +55,7 @@ class DefaultHomeAssistantRepositoryTest {
         ds: FakeDataSource = FakeDataSource(),
         ws: FakeWebSocketDataSource = FakeWebSocketDataSource(),
         store: FakeStore = FakeStore()
-    ) = DefaultHomeAssistantRepository(ds, ws, store)
+    ) = HomeAssistantEntitiesRepository(ds, ws, store)
 
     @Test
     fun `getControllableEntities filtre light et switch et mappe`() = runTest {
@@ -112,21 +111,21 @@ class DefaultHomeAssistantRepositoryTest {
 
     @Test
     fun `testConnection succes donne Result success`() = runTest {
-        val result = repo().testConnection(HomeAssistantConfig("http://x:8123", "t"))
+        val result = repo().testConnection(HomeAssistantCredentials("http://x:8123", "t"))
         assertTrue(result.isSuccess)
     }
 
     @Test
     fun `testConnection echec porte l exception`() = runTest {
         val ds = FakeDataSource().apply { testError = HomeAssistantException.Unauthorized }
-        val result = repo(ds).testConnection(HomeAssistantConfig("http://x:8123", "bad"))
+        val result = repo(ds).testConnection(HomeAssistantCredentials("http://x:8123", "bad"))
         assertTrue(result.exceptionOrNull() is HomeAssistantException.Unauthorized)
     }
 
     @Test
     fun `saveConfig delegue au store`() = runTest {
         val store = FakeStore()
-        repo(store = store).saveConfig(HomeAssistantConfig("http://x:8123", "t"))
+        repo(store = store).saveConfig(HomeAssistantCredentials("http://x:8123", "t"))
         assertEquals("http://x:8123", store.saved?.baseUrl)
     }
 
