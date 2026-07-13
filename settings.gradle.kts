@@ -22,7 +22,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "HomeController"
+rootProject.name = "Home Controller"
 include(":app")
 include(":core:model")
 include(":core:testing")

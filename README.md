@@ -18,8 +18,6 @@ A modular Android app to control smart-home devices from a single phone — **Ho
 | <img src="docs/screenshots/04-ble-bluetooth-off.png" width="180"/> | <img src="docs/screenshots/06-ble-ready.png" width="180"/> | <img src="docs/screenshots/07-ble-scanning.png" width="180"/> | <img src="docs/screenshots/08-bt-classic.png" width="180"/> |
 | Guard state driving the user to enable Bluetooth. | Idle state before a scan. | Live results, sorted and RSSI-stabilized. | Paired vs. discovered devices, in sections. |
 
-<sub>Note: `05-ble-bluetooth-off.png` (Screenshot_5) is identical to `04` (both the "Bluetooth disabled" state) — swap it out for another state if you'd like more variety.</sub>
-
 ---
 
 ## Features
