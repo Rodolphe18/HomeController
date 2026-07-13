@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.francotte.homecontroller.core.model.BleDevice
 
@@ -46,12 +47,12 @@ fun BleDeviceCard(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = device.name ?: "Inconnu",
+                    text = device.name ?: stringResource(R.string.core_ui_device_unknown),
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(text = device.address, style = MaterialTheme.typography.bodySmall)
             }
-            RssiBadge("${device.rssi} dBm")
+            RssiBadge(stringResource(R.string.core_ui_rssi_dbm, device.rssi))
         }
     }
 }

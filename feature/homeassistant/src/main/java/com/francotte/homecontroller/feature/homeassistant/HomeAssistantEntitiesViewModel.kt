@@ -1,5 +1,6 @@
 package com.francotte.homecontroller.feature.homeassistant
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.francotte.homecontroller.core.data.HomeAssistantEntities
@@ -38,8 +39,8 @@ class HomeAssistantEntitiesViewModel @Inject constructor(
     private data class InternalState(
         val entities: List<HomeAssistantEntity>? = null,
         val isRefreshing: Boolean = false,
-        val listError: String? = null,
-        val transientError: String? = null
+        @param:StringRes val listError: Int? = null,
+        @param:StringRes val transientError: Int? = null
     )
 
     private val internal = MutableStateFlow(InternalState())
@@ -105,7 +106,7 @@ class HomeAssistantEntitiesViewModel @Inject constructor(
                 internal.update { s ->
                     s.copy(
                         entities = s.entities?.map { if (it.entityId == entityId) it.copy(isOn = !on) else it },
-                        transientError = t.toMessage()
+                        transientError = t.toMessageRes()
                     )
                 }
             }
@@ -122,7 +123,7 @@ class HomeAssistantEntitiesViewModel @Inject constructor(
                     it.copy(
                         entities = it.entities ?: emptyList(),   // reste sur Content(vide) plutôt que Loading
                         isRefreshing = false,
-                        listError = t.toMessage()
+                        listError = t.toMessageRes()
                     )
                 }
             }

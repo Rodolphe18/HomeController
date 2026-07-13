@@ -1,6 +1,7 @@
 package com.francotte.homecontroller.navigation
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -24,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import com.francotte.homecontroller.R
 import com.francotte.homecontroller.core.designsystem.theme.IndigoBackdropBottom
 import com.francotte.homecontroller.core.designsystem.theme.IndigoBackdropTop
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -38,13 +41,13 @@ import com.francotte.homecontroller.feature.homeassistant.HomeAssistantScreen
 import com.francotte.homecontroller.feature.btlowenergy.BleScanScreen
 
 private enum class TopTab(
-    val label: String,
+    @param:StringRes val labelRes: Int,
     @DrawableRes val icon: Int,
     @DrawableRes val selectedIcon: Int = icon
 ) {
-    HomeAssistant("Home Assistant", AppIcons.HomeAssistant, AppIcons.HomeFilled),
-    Ble("BLE", AppIcons.Ble),
-    BtClassic("Classic", AppIcons.BtClassic)
+    HomeAssistant(R.string.app_tab_home_assistant, AppIcons.HomeAssistant, AppIcons.HomeFilled),
+    Ble(R.string.app_tab_ble, AppIcons.Ble),
+    BtClassic(R.string.app_tab_classic, AppIcons.BtClassic)
 }
 
 @Composable
@@ -78,9 +81,9 @@ fun HomeControllerAppShell() {
                             onClick = { selected = tab },
                             icon = {
                                 val iconRes = if (isSelected) tab.selectedIcon else tab.icon
-                                Icon(painterResource(iconRes), contentDescription = tab.label)
+                                Icon(painterResource(iconRes), contentDescription = stringResource(tab.labelRes))
                             },
-                            label = { Text(tab.label) },
+                            label = { Text(stringResource(tab.labelRes)) },
                             colors = NavigationBarItemDefaults.colors(
                                 indicatorColor = MaterialTheme.colorScheme.primaryContainer,
                                 selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,

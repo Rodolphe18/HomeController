@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -51,7 +52,7 @@ fun DeviceControlScreen(
 
             when (val connection = uiState.connection) {
                 EspConnectionState.Connecting ->
-                    LoadingState(label = "Connexion en cours…")
+                    LoadingState(label = stringResource(R.string.feature_devicedetail_connecting))
 
                 EspConnectionState.Connected -> {
                     Card(
@@ -71,35 +72,46 @@ fun DeviceControlScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text("LED", style = MaterialTheme.typography.titleMedium)
+                                Text(
+                                    stringResource(R.string.feature_devicedetail_led),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
                                 Switch(
                                     checked = uiState.ledOn,
                                     onCheckedChange = { viewModel.onLedToggle(it) }
                                 )
                             }
-                            Text("Compteur : ${uiState.counter ?: "—"}")
+                            Text(
+                                stringResource(
+                                    R.string.feature_devicedetail_counter,
+                                    uiState.counter?.toString()
+                                        ?: stringResource(R.string.feature_devicedetail_counter_none)
+                                )
+                            )
                         }
                     }
-                    uiState.transientError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                    uiState.transientError?.let {
+                        Text(stringResource(it), color = MaterialTheme.colorScheme.error)
+                    }
                 }
 
                 EspConnectionState.Disconnected -> StatusScreen(
                     icon = AppIcons.BluetoothDisabled,
-                    title = "Déconnecté",
-                    description = "La connexion avec l'appareil ESP32 est fermée.",
-                    primaryAction = StatusAction("Reconnecter") { viewModel.onRetry() }
+                    title = stringResource(R.string.feature_devicedetail_disconnected_title),
+                    description = stringResource(R.string.feature_devicedetail_disconnected_description),
+                    primaryAction = StatusAction(stringResource(R.string.feature_devicedetail_reconnect)) { viewModel.onRetry() }
                 )
 
                 is EspConnectionState.Error -> StatusScreen(
                     icon = AppIcons.Warning,
-                    title = "Erreur de connexion",
+                    title = stringResource(R.string.feature_devicedetail_error_title),
                     description = connection.message,
-                    primaryAction = StatusAction("Réessayer") { viewModel.onRetry() }
+                    primaryAction = StatusAction(stringResource(R.string.feature_devicedetail_retry)) { viewModel.onRetry() }
                 )
             }
 
             Spacer(Modifier.height(8.dp))
-            Button(onClick = onBack) { Text("Retour") }
+            Button(onClick = onBack) { Text(stringResource(R.string.feature_devicedetail_back)) }
         }
     }
 }

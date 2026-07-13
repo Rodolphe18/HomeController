@@ -51,7 +51,7 @@ class HomeAssistantConfigurationViewModel @Inject constructor(
                     _savedEvents.send(Unit)
                 },
                 onFailure = { error ->
-                    _form.update { it.copy(isTesting = false, error = error.toMessage()) }
+                    _form.update { it.copy(isTesting = false, error = error.toMessageRes()) }
                 }
             )
         }

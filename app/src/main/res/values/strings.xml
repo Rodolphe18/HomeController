@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">HomeController</string>
+
+    <!-- Libellés des onglets de navigation -->
+    <string name="app_tab_home_assistant">Home Assistant</string>
+    <string name="app_tab_ble">BLE</string>
+    <string name="app_tab_classic">Classic</string>
 </resources>

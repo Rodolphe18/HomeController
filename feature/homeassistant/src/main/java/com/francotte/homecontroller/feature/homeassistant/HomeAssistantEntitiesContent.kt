@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -53,7 +54,7 @@ fun HomeAssistantEntitiesContent(
         verticalAlignment = Alignment.Top
     ) {
         Text(
-            text = "Home Assistant",
+            text = stringResource(R.string.feature_homeassistant_title),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold
         )
@@ -68,7 +69,7 @@ fun HomeAssistantEntitiesContent(
         ) {
             Icon(
                 painter = painterResource(AppIcons.SettingsFilled),
-                contentDescription = "Configuration",
+                contentDescription = stringResource(R.string.feature_homeassistant_settings),
                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier.size(30.dp)
             )
@@ -77,11 +78,12 @@ fun HomeAssistantEntitiesContent(
     Spacer(Modifier.height(8.dp))
 
     when (val s = state) {
-        EntitiesUiState.Loading -> LoadingState(label = "Chargement…")
+        EntitiesUiState.Loading ->
+            LoadingState(label = stringResource(R.string.feature_homeassistant_loading))
 
         is EntitiesUiState.Content -> {
-            s.transientError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-            s.listError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            s.transientError?.let { Text(stringResource(it), color = MaterialTheme.colorScheme.error) }
+            s.listError?.let { Text(stringResource(it), color = MaterialTheme.colorScheme.error) }
             Spacer(Modifier.height(8.dp))
 
             PullToRefreshBox(
@@ -92,8 +94,8 @@ fun HomeAssistantEntitiesContent(
                 if (s.items.isEmpty() && s.listError == null) {
                     StatusScreen(
                         icon = AppIcons.LightbulbEmpty,
-                        title = "Aucun appareil",
-                        description = "Aucune lumière ni prise commandable n'a été trouvée sur votre instance Home Assistant."
+                        title = stringResource(R.string.feature_homeassistant_empty_title),
+                        description = stringResource(R.string.feature_homeassistant_empty_description)
                     )
                 } else {
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {

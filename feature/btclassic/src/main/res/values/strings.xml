@@ -1,0 +1,21 @@
+<resources>
+    <string name="feature_btclassic_permission_title">Permission requise</string>
+    <string name="feature_btclassic_permission_description">HomeController a besoin de la permission Bluetooth pour scanner les appareils.</string>
+    <string name="feature_btclassic_permission_grant">Accorder la permission</string>
+    <string name="feature_btclassic_bluetooth_off_title">Bluetooth désactivé</string>
+    <string name="feature_btclassic_bluetooth_off_description">Activez le Bluetooth pour scanner les appareils Bluetooth Classic.</string>
+    <string name="feature_btclassic_bluetooth_enable">Activer le Bluetooth</string>
+    <string name="feature_btclassic_idle_title">Prêt à scanner</string>
+    <string name="feature_btclassic_idle_description">Lancez une recherche pour découvrir les appareils Bluetooth Classic appairés et à proximité.</string>
+    <string name="feature_btclassic_scan">Scanner</string>
+    <string name="feature_btclassic_stop">Arrêter</string>
+    <string name="feature_btclassic_scanning">Recherche d\'appareils…</string>
+    <string name="feature_btclassic_empty_title">Aucun appareil trouvé</string>
+    <string name="feature_btclassic_empty_description">Aucun appareil Bluetooth Classic n\'a été détecté. Vérifiez qu\'ils sont allumés et visibles.</string>
+    <string name="feature_btclassic_scan_again">Scanner à nouveau</string>
+    <string name="feature_btclassic_error_title">Une erreur est survenue</string>
+    <string name="feature_btclassic_retry">Réessayer</string>
+    <string name="feature_btclassic_section_paired">Appairés</string>
+    <string name="feature_btclassic_section_discovered">Découverts</string>
+    <string name="feature_btclassic_scan_failed">Échec du scan</string>
+</resources>

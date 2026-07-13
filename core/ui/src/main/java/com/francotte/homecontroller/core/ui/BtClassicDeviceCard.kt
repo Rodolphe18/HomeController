@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.francotte.homecontroller.core.model.BtClassicDevice
 
@@ -41,16 +42,20 @@ fun BtClassicDeviceCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(device.name ?: "Inconnu", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    device.name ?: stringResource(R.string.core_ui_device_unknown),
+                    style = MaterialTheme.typography.titleMedium
+                )
                 Text(device.address, style = MaterialTheme.typography.bodySmall)
                 Text(
-                    text = device.rssi?.let { "$it dBm" } ?: "— dBm",
+                    text = device.rssi?.let { stringResource(R.string.core_ui_rssi_dbm, it) }
+                        ?: stringResource(R.string.core_ui_rssi_unknown),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
             if (device.bonded) {
                 Text(
-                    text = "Appairé",
+                    text = stringResource(R.string.core_ui_paired),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                     modifier = Modifier

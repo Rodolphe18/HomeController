@@ -1,0 +1,9 @@
+<resources>
+    <!-- Cartes d\'appareils (composites model-aware) -->
+    <string name="core_ui_device_unknown">Inconnu</string>
+    <string name="core_ui_rssi_dbm">%1$d dBm</string>
+    <string name="core_ui_rssi_unknown">— dBm</string>
+    <string name="core_ui_paired">Appairé</string>
+    <string name="core_ui_entity_state_on">Allumée</string>
+    <string name="core_ui_entity_state_off">Éteinte</string>
+</resources>

@@ -76,11 +76,14 @@ class BleScanViewModel @Inject constructor(
                     _uiState.value = BleScanUiState.Scanning(stabilizer.update(snapshot))
                 }
                 .catch { throwable ->
-                    val message = when (throwable) {
-                        is BleScanException -> "Échec du scan (code ${throwable.errorCode})"
-                        else -> throwable.message ?: "Échec du scan"
+                    // Le texte affiché est décidé ici (ressource + arg éventuel), pas hérité du message brut.
+                    _uiState.value = when (throwable) {
+                        is BleScanException -> BleScanUiState.Error(
+                            R.string.feature_btlowenergy_scan_failed_code,
+                            listOf(throwable.errorCode)
+                        )
+                        else -> BleScanUiState.Error(R.string.feature_btlowenergy_scan_failed)
                     }
-                    _uiState.value = BleScanUiState.Error(message)
                 }
                 .collect()
         }

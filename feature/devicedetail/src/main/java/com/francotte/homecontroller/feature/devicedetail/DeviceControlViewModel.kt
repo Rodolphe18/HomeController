@@ -31,7 +31,7 @@ class DeviceControlViewModel @AssistedInject constructor(
     }
 
     private val ledOn = MutableStateFlow(false)
-    private val transientError = MutableStateFlow<String?>(null)
+    private val transientError = MutableStateFlow<Int?>(null)
 
     val uiState = combine(
         client.state,
@@ -58,7 +58,7 @@ class DeviceControlViewModel @AssistedInject constructor(
                 client.setLed(on)
             } catch (t: Throwable) {
                 ledOn.value = !on   // échec → on revient en arrière
-                transientError.value = "Échec de l'écriture de la LED"
+                transientError.value = R.string.feature_devicedetail_led_write_failed
             }
         }
     }

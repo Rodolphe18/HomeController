@@ -1,5 +1,6 @@
 package com.francotte.homecontroller.feature.homeassistant
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.francotte.homecontroller.core.domain.GetEntityDetailUseCase
@@ -42,8 +43,8 @@ class EntityDetailViewModel @AssistedInject constructor(
     private data class Internal(
         val detail: EntityDetail? = null,     // null = pas encore chargé (→ Loading)
         val draggingPercent: Int? = null,     // non-null = glissement en cours (affichage)
-        val loadError: String? = null,
-        val transientError: String? = null
+        @param:StringRes val loadError: Int? = null,
+        @param:StringRes val transientError: Int? = null
     )
 
     private val internal = MutableStateFlow(Internal())
@@ -95,7 +96,7 @@ class EntityDetailViewModel @AssistedInject constructor(
             try {
                 setBrightness(entityId, p)
             } catch (t: Throwable) {
-                internal.update { it.copy(detail = previous, transientError = t.toMessage()) }
+                internal.update { it.copy(detail = previous, transientError = t.toMessageRes()) }
             }
         }
     }
@@ -107,7 +108,7 @@ class EntityDetailViewModel @AssistedInject constructor(
             try {
                 setEntityState(entityId, on)
             } catch (t: Throwable) {
-                internal.update { it.copy(detail = previous, transientError = t.toMessage()) }
+                internal.update { it.copy(detail = previous, transientError = t.toMessageRes()) }
             }
         }
     }
@@ -117,7 +118,7 @@ class EntityDetailViewModel @AssistedInject constructor(
             val d = getEntityDetail(entityId)
             internal.update { it.copy(detail = d, loadError = null) }
         } catch (t: Throwable) {
-            internal.update { it.copy(loadError = t.toMessage()) }
+            internal.update { it.copy(loadError = t.toMessageRes()) }
         }
     }
 

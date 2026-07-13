@@ -1,5 +1,6 @@
 package com.francotte.homecontroller.feature.btclassic
 
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import com.francotte.homecontroller.core.model.BtClassicDevice
 
@@ -24,5 +25,5 @@ sealed interface BtClassicUiState {
 
     /** Échec de la découverte. */
     @Immutable
-    data class Error(val message: String) : BtClassicUiState
+    data class Error(@param:StringRes val messageRes: Int) : BtClassicUiState
 }

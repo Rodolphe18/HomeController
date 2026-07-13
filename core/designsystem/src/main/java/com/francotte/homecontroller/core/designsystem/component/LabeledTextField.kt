@@ -46,9 +46,9 @@ fun LabeledTextField(
     keyboardType: KeyboardType = KeyboardType.Text
 ) {
     var focused by remember { mutableStateOf(false) }
-    val cs = MaterialTheme.colorScheme
-    val accent = if (focused) cs.primary else cs.onSurfaceVariant
-    val borderColor = if (focused) cs.primary else cs.outlineVariant
+    val colorScheme = MaterialTheme.colorScheme
+    val accent = if (focused) colorScheme.primary else colorScheme.onSurfaceVariant
+    val borderColor = if (focused) colorScheme.primary else colorScheme.outlineVariant
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(
             text = label,
@@ -59,8 +59,8 @@ fun LabeledTextField(
             value = value,
             onValueChange = onValueChange,
             singleLine = true,
-            textStyle = MaterialTheme.typography.bodyLarge.copy(color = cs.onSurface),
-            cursorBrush = SolidColor(cs.primary),
+            textStyle = MaterialTheme.typography.bodyLarge.copy(color = colorScheme.onSurface),
+            cursorBrush = SolidColor(colorScheme.primary),
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             modifier = Modifier
                 .fillMaxWidth()
@@ -69,7 +69,7 @@ fun LabeledTextField(
                 Row(
                     modifier = Modifier
                         .clip(MaterialTheme.shapes.medium)
-                        .background(cs.surface)
+                        .background(colorScheme.surface)
                         .border(
                             width = if (focused) 2.dp else 1.dp,
                             color = borderColor,
@@ -90,7 +90,7 @@ fun LabeledTextField(
                             Text(
                                 text = placeholder,
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = cs.onSurfaceVariant.copy(alpha = 0.6f)
+                                color = colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                             )
                         }
                         innerTextField()

@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -97,9 +98,9 @@ fun BtClassicScanScreen(
             BtClassicUiState.PermissionRequired -> StatusScreen(
                 modifier = Modifier.padding(innerPadding),
                 icon = AppIcons.Lock,
-                title = "Permission requise",
-                description = "HomeController a besoin de la permission Bluetooth pour scanner les appareils.",
-                primaryAction = StatusAction("Accorder la permission") {
+                title = stringResource(R.string.feature_btclassic_permission_title),
+                description = stringResource(R.string.feature_btclassic_permission_description),
+                primaryAction = StatusAction(stringResource(R.string.feature_btclassic_permission_grant)) {
                     permissionLauncher.launch(requiredScanPermissions())
                 }
             )
@@ -107,9 +108,9 @@ fun BtClassicScanScreen(
             BtClassicUiState.BluetoothOff -> StatusScreen(
                 modifier = Modifier.padding(innerPadding),
                 icon = AppIcons.BluetoothDisabled,
-                title = "Bluetooth désactivé",
-                description = "Activez le Bluetooth pour scanner les appareils Bluetooth Classic.",
-                primaryAction = StatusAction("Activer le Bluetooth") {
+                title = stringResource(R.string.feature_btclassic_bluetooth_off_title),
+                description = stringResource(R.string.feature_btclassic_bluetooth_off_description),
+                primaryAction = StatusAction(stringResource(R.string.feature_btclassic_bluetooth_enable)) {
                     enableBluetoothLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
                 }
             )
@@ -117,9 +118,9 @@ fun BtClassicScanScreen(
             BtClassicUiState.Idle -> StatusScreen(
                 modifier = Modifier.padding(innerPadding),
                 icon = AppIcons.Bluetooth,
-                title = "Prêt à scanner",
-                description = "Lancez une recherche pour découvrir les appareils Bluetooth Classic appairés et à proximité.",
-                primaryAction = StatusAction("Scanner") { viewModel.startScan() }
+                title = stringResource(R.string.feature_btclassic_idle_title),
+                description = stringResource(R.string.feature_btclassic_idle_description),
+                primaryAction = StatusAction(stringResource(R.string.feature_btclassic_scan)) { viewModel.startScan() }
             )
 
             is BtClassicUiState.Scanning -> Column(
@@ -128,12 +129,14 @@ fun BtClassicScanScreen(
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                Button(onClick = { viewModel.stopScan() }) { Text("Arrêter") }
+                Button(onClick = { viewModel.stopScan() }) {
+                    Text(stringResource(R.string.feature_btclassic_stop))
+                }
                 Spacer(Modifier.height(16.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     CircularProgressIndicator(Modifier.size(20.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Recherche d'appareils…")
+                    Text(stringResource(R.string.feature_btclassic_scanning))
                 }
                 Spacer(Modifier.height(12.dp))
                 DeviceList(state.devices)
@@ -144,9 +147,9 @@ fun BtClassicScanScreen(
                     StatusScreen(
                         modifier = Modifier.padding(innerPadding),
                         icon = AppIcons.Bluetooth,
-                        title = "Aucun appareil trouvé",
-                        description = "Aucun appareil Bluetooth Classic n'a été détecté. Vérifiez qu'ils sont allumés et visibles.",
-                        primaryAction = StatusAction("Scanner à nouveau") { viewModel.startScan() }
+                        title = stringResource(R.string.feature_btclassic_empty_title),
+                        description = stringResource(R.string.feature_btclassic_empty_description),
+                        primaryAction = StatusAction(stringResource(R.string.feature_btclassic_scan_again)) { viewModel.startScan() }
                     )
                 } else {
                     Column(
@@ -155,7 +158,9 @@ fun BtClassicScanScreen(
                             .fillMaxSize()
                             .padding(16.dp)
                     ) {
-                        Button(onClick = { viewModel.startScan() }) { Text("Scanner à nouveau") }
+                        Button(onClick = { viewModel.startScan() }) {
+                            Text(stringResource(R.string.feature_btclassic_scan_again))
+                        }
                         Spacer(Modifier.height(16.dp))
                         DeviceList(state.devices)
                     }
@@ -164,9 +169,9 @@ fun BtClassicScanScreen(
             is BtClassicUiState.Error -> StatusScreen(
                 modifier = Modifier.padding(innerPadding),
                 icon = AppIcons.Warning,
-                title = "Une erreur est survenue",
-                description = state.message,
-                primaryAction = StatusAction("Réessayer") {
+                title = stringResource(R.string.feature_btclassic_error_title),
+                description = stringResource(state.messageRes),
+                primaryAction = StatusAction(stringResource(R.string.feature_btclassic_retry)) {
                     refreshAvailability()
                     viewModel.startScan()
                 }
@@ -181,11 +186,11 @@ private fun DeviceList(devices: List<BtClassicDevice>) {
     val discovered = devices.filter { !it.bonded }
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         if (paired.isNotEmpty()) {
-            item(key = "header_paired") { SectionHeader("Appairés") }
+            item(key = "header_paired") { SectionHeader(stringResource(R.string.feature_btclassic_section_paired)) }
             items(paired, key = { it.address }) { device -> BtClassicDeviceCard(device) }
         }
         if (discovered.isNotEmpty()) {
-            item(key = "header_discovered") { SectionHeader("Découverts") }
+            item(key = "header_discovered") { SectionHeader(stringResource(R.string.feature_btclassic_section_discovered)) }
             items(discovered, key = { it.address }) { device -> BtClassicDeviceCard(device) }
         }
     }

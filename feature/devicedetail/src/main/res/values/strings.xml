@@ -1,0 +1,13 @@
+<resources>
+    <string name="feature_devicedetail_connecting">Connexion en cours…</string>
+    <string name="feature_devicedetail_led">LED</string>
+    <string name="feature_devicedetail_counter">Compteur : %1$s</string>
+    <string name="feature_devicedetail_counter_none">—</string>
+    <string name="feature_devicedetail_disconnected_title">Déconnecté</string>
+    <string name="feature_devicedetail_disconnected_description">La connexion avec l\'appareil ESP32 est fermée.</string>
+    <string name="feature_devicedetail_reconnect">Reconnecter</string>
+    <string name="feature_devicedetail_error_title">Erreur de connexion</string>
+    <string name="feature_devicedetail_retry">Réessayer</string>
+    <string name="feature_devicedetail_back">Retour</string>
+    <string name="feature_devicedetail_led_write_failed">Échec de l\'écriture de la LED</string>
+</resources>

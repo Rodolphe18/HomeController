@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -77,12 +78,15 @@ fun HomeAssistantConfigurationScreen(
         contentColor = MaterialTheme.colorScheme.onSurface,
         topBar = {
             TopAppBar(
-                title = { Text("Connexion à Home Assistant") },
+                title = { Text(stringResource(R.string.feature_homeassistant_config_title)) },
                 navigationIcon = {
                     // Bouton fermer à gauche, sur la même ligne que le titre (édition uniquement).
                     if (canCancel) {
                         IconButton(onClick = onCancel) {
-                            Icon(painterResource(AppIcons.Close), contentDescription = "Close")
+                            Icon(
+                                painterResource(AppIcons.Close),
+                                contentDescription = stringResource(R.string.feature_homeassistant_config_close)
+                            )
                         }
                     }
                 },
@@ -104,7 +108,7 @@ fun HomeAssistantConfigurationScreen(
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             Text(
-                text = "Saisissez l'adresse locale de votre instance ainsi que le jeton d'accès longue durée",
+                text = stringResource(R.string.feature_homeassistant_config_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -124,8 +128,8 @@ fun HomeAssistantConfigurationScreen(
                     LabeledTextField(
                         value = form.url,
                         onValueChange = viewModel::onUrlChange,
-                        label = "Adresse locale",
-                        placeholder = "http://192.168.1.x:8123",
+                        label = stringResource(R.string.feature_homeassistant_config_url_label),
+                        placeholder = stringResource(R.string.feature_homeassistant_config_url_placeholder),
                         leadingIcon = AppIcons.Link,
                         keyboardType = KeyboardType.Uri,
                         modifier = Modifier.fillMaxWidth()
@@ -133,8 +137,8 @@ fun HomeAssistantConfigurationScreen(
                     LabeledTextField(
                         value = form.token,
                         onValueChange = viewModel::onTokenChange,
-                        label = "Jeton d'accès longue durée",
-                        placeholder = "Jeton d'accès longue durée",
+                        label = stringResource(R.string.feature_homeassistant_config_token_label),
+                        placeholder = stringResource(R.string.feature_homeassistant_config_token_label),
                         leadingIcon = AppIcons.Lock,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -142,7 +146,7 @@ fun HomeAssistantConfigurationScreen(
             }
 
             // Erreur dans un conteneur dédié plutôt qu'un simple texte rouge.
-            form.error?.let { message ->
+            form.error?.let { messageRes ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -159,7 +163,7 @@ fun HomeAssistantConfigurationScreen(
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
-                        text = message,
+                        text = stringResource(messageRes),
                         color = MaterialTheme.colorScheme.onErrorContainer,
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -182,9 +186,9 @@ fun HomeAssistantConfigurationScreen(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text("En cours de test…")
+                    Text(stringResource(R.string.feature_homeassistant_config_testing))
                 } else {
-                    Text("Sauvegarder")
+                    Text(stringResource(R.string.feature_homeassistant_config_save))
                 }
             }
         }

@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.francotte.homecontroller.core.designsystem.AppIcons
 import com.francotte.homecontroller.core.model.HomeAssistantEntity
@@ -42,15 +43,15 @@ fun EntityCard(
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val cs = MaterialTheme.colorScheme
+    val colorScheme = MaterialTheme.colorScheme
     val accent = when (accentIndex % 3) {
-        0 -> RowAccent(cs.primary, cs.onPrimary, cs.primaryContainer, cs.onPrimaryContainer)
-        1 -> RowAccent(cs.tertiary, cs.onTertiary, cs.tertiaryContainer, cs.onTertiaryContainer)
+        0 -> RowAccent(colorScheme.primary, colorScheme.onPrimary, colorScheme.primaryContainer, colorScheme.onPrimaryContainer)
+        1 -> RowAccent(colorScheme.tertiary, colorScheme.onTertiary, colorScheme.tertiaryContainer, colorScheme.onTertiaryContainer)
         else -> RowAccent(
-            cs.secondary,
-            cs.onSecondary,
-            cs.secondaryContainer,
-            cs.onSecondaryContainer
+            colorScheme.secondary,
+            colorScheme.onSecondary,
+            colorScheme.secondaryContainer,
+            colorScheme.onSecondaryContainer
         )
     }
     // Icône selon le type : puce pour l'ESP32, ampoule pour les lumières, prise sinon.
@@ -59,8 +60,8 @@ fun EntityCard(
         entity.domain == "light" -> AppIcons.LightbulbEmpty
         else -> AppIcons.Plug
     }
-    val containerColor = if (entity.isOn) accent.container else cs.surfaceContainerHigh
-    val contentColor = if (entity.isOn) accent.onContainer else cs.onSurface
+    val containerColor = if (entity.isOn) accent.container else colorScheme.surfaceContainerHigh
+    val contentColor = if (entity.isOn) accent.onContainer else colorScheme.onSurface
     Card(
         colors = CardDefaults.cardColors(
             containerColor = containerColor,
@@ -99,7 +100,10 @@ fun EntityCard(
                     maxLines = 2
                 )
                 Text(
-                    text = if (entity.isOn) "Allumée" else "Éteinte",
+                    text = stringResource(
+                        if (entity.isOn) R.string.core_ui_entity_state_on
+                        else R.string.core_ui_entity_state_off
+                    ),
                     style = MaterialTheme.typography.labelMedium
                 )
             }

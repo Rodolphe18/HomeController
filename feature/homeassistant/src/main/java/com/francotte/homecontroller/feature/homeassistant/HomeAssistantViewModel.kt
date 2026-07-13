@@ -1,5 +1,6 @@
 package com.francotte.homecontroller.feature.homeassistant
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.francotte.homecontroller.core.domain.ObserveConfigUseCase
@@ -57,10 +58,15 @@ class HomeAssistantViewModel @Inject constructor(
     }
 }
 
-/** Message utilisateur pour une erreur (typée ou générique). Partagé par les VMs du feature. */
-internal fun Throwable.toMessage(): String = when (this) {
-    is HomeAssistantException.Unauthorized -> "Token rejected. Check your access token."
-    is HomeAssistantException.Unreachable -> "Home Assistant unreachable. Make sure your device's Wi-Fi is on."
-    is HomeAssistantException.NotConfigured -> "Home Assistant doesn't seem to be configured."
-    else -> message ?: "Unknown error."
+/**
+ * Ressource de message utilisateur pour une erreur (typée ou générique). Partagée par les VMs du
+ * feature. On renvoie un [StringRes] (et non un String) pour garder les ViewModels sans Context :
+ * le texte est résolu dans le Composable via `stringResource`.
+ */
+@StringRes
+internal fun Throwable.toMessageRes(): Int = when (this) {
+    is HomeAssistantException.Unauthorized -> R.string.feature_homeassistant_error_unauthorized
+    is HomeAssistantException.Unreachable -> R.string.feature_homeassistant_error_unreachable
+    is HomeAssistantException.NotConfigured -> R.string.feature_homeassistant_error_not_configured
+    else -> R.string.feature_homeassistant_error_unknown
 }

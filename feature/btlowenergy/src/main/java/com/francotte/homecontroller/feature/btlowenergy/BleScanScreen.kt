@@ -26,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -93,9 +94,9 @@ fun BleScanScreen(
             BleScanUiState.PermissionRequired -> StatusScreen(
                 modifier = Modifier.padding(innerPadding),
                 icon = AppIcons.Lock,
-                title = "Permission requise",
-                description = "HomeController a besoin de la permission Bluetooth pour trouver vos appareils à proximité.",
-                primaryAction = StatusAction("Accorder la permission") {
+                title = stringResource(R.string.feature_btlowenergy_permission_title),
+                description = stringResource(R.string.feature_btlowenergy_permission_description),
+                primaryAction = StatusAction(stringResource(R.string.feature_btlowenergy_permission_grant)) {
                     permissionLauncher.launch(requiredScanPermissions())
                 }
             )
@@ -103,9 +104,9 @@ fun BleScanScreen(
             BleScanUiState.BluetoothOff -> StatusScreen(
                 modifier = Modifier.padding(innerPadding),
                 icon = AppIcons.BluetoothDisabled,
-                title = "Bluetooth désactivé",
-                description = "Activez le Bluetooth pour scanner les appareils autour de vous.",
-                primaryAction = StatusAction("Activer le Bluetooth") {
+                title = stringResource(R.string.feature_btlowenergy_bluetooth_off_title),
+                description = stringResource(R.string.feature_btlowenergy_bluetooth_off_description),
+                primaryAction = StatusAction(stringResource(R.string.feature_btlowenergy_bluetooth_enable)) {
                     enableBluetoothLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
                 }
             )
@@ -113,16 +114,16 @@ fun BleScanScreen(
             BleScanUiState.Idle -> StatusScreen(
                 modifier = Modifier.padding(innerPadding),
                 icon = AppIcons.Bluetooth,
-                title = "Prêt à scanner",
-                description = "Lancez une recherche pour découvrir les appareils Bluetooth Low Energy autour de vous.",
-                primaryAction = StatusAction("Démarrer le scan") { viewModel.startScan() }
+                title = stringResource(R.string.feature_btlowenergy_idle_title),
+                description = stringResource(R.string.feature_btlowenergy_idle_description),
+                primaryAction = StatusAction(stringResource(R.string.feature_btlowenergy_start_scan)) { viewModel.startScan() }
             )
 
             is BleScanUiState.Scanning ->
                 if (state.devices.isEmpty()) {
                     LoadingState(
                         modifier = Modifier.padding(innerPadding),
-                        label = "Recherche d'appareils…"
+                        label = stringResource(R.string.feature_btlowenergy_scanning)
                     )
                 } else {
                     Column(
@@ -131,7 +132,9 @@ fun BleScanScreen(
                             .fillMaxSize()
                             .padding(16.dp)
                     ) {
-                        Button(onClick = { viewModel.stopScan() }) { Text("Arrêter le scan") }
+                        Button(onClick = { viewModel.stopScan() }) {
+                            Text(stringResource(R.string.feature_btlowenergy_stop_scan))
+                        }
                         Spacer(Modifier.height(16.dp))
                         DeviceList(state.devices, onDeviceClick)
                     }
@@ -140,9 +143,9 @@ fun BleScanScreen(
             is BleScanUiState.Error -> StatusScreen(
                 modifier = Modifier.padding(innerPadding),
                 icon = AppIcons.Warning,
-                title = "Une erreur est survenue",
-                description = state.message,
-                primaryAction = StatusAction("Réessayer") {
+                title = stringResource(R.string.feature_btlowenergy_error_title),
+                description = stringResource(state.messageRes, *state.formatArgs.toTypedArray()),
+                primaryAction = StatusAction(stringResource(R.string.feature_btlowenergy_retry)) {
                     refreshAvailability()
                     viewModel.startScan()
                 }

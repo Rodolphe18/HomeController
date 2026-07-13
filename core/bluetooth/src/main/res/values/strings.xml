@@ -1,0 +1,6 @@
+<resources>
+    <!-- Erreurs de connexion ESP32 affichées à l\'utilisateur (résolues côté infra). -->
+    <string name="core_bluetooth_esp_connection_failed">Connexion échouée (code %1$d)</string>
+    <string name="core_bluetooth_esp_wrong_profile">Ce périphérique n\'expose pas le profil HomeController</string>
+    <string name="core_bluetooth_esp_adapter_unavailable">Adaptateur Bluetooth indisponible</string>
+</resources>

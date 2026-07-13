@@ -41,7 +41,9 @@ internal class AndroidEspDeviceClient @Inject constructor(
         @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onConnectionStateChange(g: BluetoothGatt, status: Int, newState: Int) {
             if (status != BluetoothGatt.GATT_SUCCESS) {
-                _state.value = EspConnectionState.Error("Connexion échouée (code $status)")
+                _state.value = EspConnectionState.Error(
+                    context.getString(R.string.core_bluetooth_esp_connection_failed, status)
+                )
                 closeGatt()
                 return
             }
@@ -61,7 +63,7 @@ internal class AndroidEspDeviceClient @Inject constructor(
             val counterChar = service?.getCharacteristic(GattProfile.COUNTER_UUID)
             if (service == null || led == null || counterChar == null) {
                 _state.value =
-                    EspConnectionState.Error("Ce périphérique n'expose pas le profil HomeController")
+                    EspConnectionState.Error(context.getString(R.string.core_bluetooth_esp_wrong_profile))
                 g.disconnect()
                 return
             }
@@ -110,7 +112,9 @@ internal class AndroidEspDeviceClient @Inject constructor(
     override fun connect(address: String) {
         val device = adapter?.getRemoteDevice(address)
         if (device == null) {
-            _state.value = EspConnectionState.Error("Adaptateur Bluetooth indisponible")
+            _state.value = EspConnectionState.Error(
+                context.getString(R.string.core_bluetooth_esp_adapter_unavailable)
+            )
             return
         }
         closeGatt()

@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -41,7 +42,7 @@ fun HomeAssistantScreen(
                         .padding(padding)
                         .padding(start = 16.dp, end = 16.dp, top = 16.dp)
                 ) {
-                    LoadingState(label = "Chargement…")
+                    LoadingState(label = stringResource(R.string.feature_homeassistant_loading))
                 }
 
             // Le formulaire porte son propre Scaffold (top app bar) : on lui passe l'inset externe.

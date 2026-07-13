@@ -59,7 +59,8 @@ class BtClassicScanViewModel @Inject constructor(
             } catch (c: CancellationException) {
                 throw c   // annulation (stopScan / VM détruit) : pas une erreur
             } catch (t: Throwable) {
-                _uiState.value = BtClassicUiState.Error(t.message ?: "Échec du scan")
+                // Le texte affiché est décidé ici (ressource), pas hérité du message d'exception.
+                _uiState.value = BtClassicUiState.Error(R.string.feature_btclassic_scan_failed)
             } finally {
                 scanJob = null
             }

@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -49,13 +50,13 @@ fun EntityDetailScreen(
         ) {
             when (val state = uiState) {
                 EntityDetailUiState.Loading ->
-                    LoadingState(label = "Chargement…")
+                    LoadingState(label = stringResource(R.string.feature_homeassistant_loading))
 
                 is EntityDetailUiState.Error -> StatusScreen(
                     icon = AppIcons.Warning,
-                    title = "Impossible de charger l'appareil",
-                    description = state.message,
-                    primaryAction = StatusAction("Retour", onBack)
+                    title = stringResource(R.string.feature_homeassistant_detail_load_error_title),
+                    description = stringResource(state.messageRes),
+                    primaryAction = StatusAction(stringResource(R.string.feature_homeassistant_back), onBack)
                 )
 
                 is EntityDetailUiState.Content -> {
@@ -73,12 +74,18 @@ fun EntityDetailScreen(
                         ) {
                             Text(state.friendlyName, style = MaterialTheme.typography.headlineSmall)
                             Text(
-                                if (state.isOn) "Allumée" else "Éteinte",
+                                stringResource(
+                                    if (state.isOn) R.string.feature_homeassistant_state_on
+                                    else R.string.feature_homeassistant_state_off
+                                ),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                             if (state.supportsBrightness && state.isOn) {
                                 Text(
-                                    "${state.brightnessPercent} %",
+                                    stringResource(
+                                        R.string.feature_homeassistant_brightness_percent,
+                                        state.brightnessPercent
+                                    ),
                                     style = MaterialTheme.typography.displaySmall
                                 )
                             }
@@ -96,8 +103,10 @@ fun EntityDetailScreen(
                     } else {
                         Switch(checked = state.isOn, onCheckedChange = viewModel::onToggle)
                     }
-                    state.transientError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-                    Button(onClick = onBack) { Text("Retour") }
+                    state.transientError?.let {
+                        Text(stringResource(it), color = MaterialTheme.colorScheme.error)
+                    }
+                    Button(onClick = onBack) { Text(stringResource(R.string.feature_homeassistant_back)) }
                 }
             }
         }

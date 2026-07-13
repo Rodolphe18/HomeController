@@ -1,0 +1,17 @@
+<resources>
+    <string name="feature_btlowenergy_permission_title">Permission requise</string>
+    <string name="feature_btlowenergy_permission_description">HomeController a besoin de la permission Bluetooth pour trouver vos appareils à proximité.</string>
+    <string name="feature_btlowenergy_permission_grant">Accorder la permission</string>
+    <string name="feature_btlowenergy_bluetooth_off_title">Bluetooth désactivé</string>
+    <string name="feature_btlowenergy_bluetooth_off_description">Activez le Bluetooth pour scanner les appareils autour de vous.</string>
+    <string name="feature_btlowenergy_bluetooth_enable">Activer le Bluetooth</string>
+    <string name="feature_btlowenergy_idle_title">Prêt à scanner</string>
+    <string name="feature_btlowenergy_idle_description">Lancez une recherche pour découvrir les appareils Bluetooth Low Energy autour de vous.</string>
+    <string name="feature_btlowenergy_start_scan">Démarrer le scan</string>
+    <string name="feature_btlowenergy_stop_scan">Arrêter le scan</string>
+    <string name="feature_btlowenergy_scanning">Recherche d\'appareils…</string>
+    <string name="feature_btlowenergy_error_title">Une erreur est survenue</string>
+    <string name="feature_btlowenergy_retry">Réessayer</string>
+    <string name="feature_btlowenergy_scan_failed">Échec du scan</string>
+    <string name="feature_btlowenergy_scan_failed_code">Échec du scan (code %1$d)</string>
+</resources>

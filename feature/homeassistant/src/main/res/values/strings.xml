@@ -1,0 +1,33 @@
+<resources>
+    <!-- Commun -->
+    <string name="feature_homeassistant_loading">Chargement…</string>
+    <string name="feature_homeassistant_back">Retour</string>
+    <string name="feature_homeassistant_state_on">Allumée</string>
+    <string name="feature_homeassistant_state_off">Éteinte</string>
+
+    <!-- Écran des entités -->
+    <string name="feature_homeassistant_title">Home Assistant</string>
+    <string name="feature_homeassistant_settings">Configuration</string>
+    <string name="feature_homeassistant_empty_title">Aucun appareil</string>
+    <string name="feature_homeassistant_empty_description">Aucune lumière ni prise commandable n\'a été trouvée sur votre instance Home Assistant.</string>
+
+    <!-- Écran de détail d\'une entité -->
+    <string name="feature_homeassistant_detail_load_error_title">Impossible de charger l\'appareil</string>
+    <string name="feature_homeassistant_brightness_percent">%1$d %%</string>
+
+    <!-- Écran de configuration -->
+    <string name="feature_homeassistant_config_title">Connexion à Home Assistant</string>
+    <string name="feature_homeassistant_config_close">Fermer</string>
+    <string name="feature_homeassistant_config_subtitle">Saisissez l\'adresse locale de votre instance ainsi que le jeton d\'accès longue durée</string>
+    <string name="feature_homeassistant_config_url_label">Adresse locale</string>
+    <string name="feature_homeassistant_config_url_placeholder">http://192.168.1.x:8123</string>
+    <string name="feature_homeassistant_config_token_label">Jeton d\'accès longue durée</string>
+    <string name="feature_homeassistant_config_testing">En cours de test…</string>
+    <string name="feature_homeassistant_config_save">Sauvegarder</string>
+
+    <!-- Messages d\'erreur (résolus depuis les ViewModels via @StringRes) -->
+    <string name="feature_homeassistant_error_unauthorized">Jeton refusé. Vérifiez votre jeton d\'accès.</string>
+    <string name="feature_homeassistant_error_unreachable">Home Assistant injoignable. Vérifiez que le Wi-Fi de votre appareil est activé.</string>
+    <string name="feature_homeassistant_error_not_configured">Home Assistant ne semble pas configuré.</string>
+    <string name="feature_homeassistant_error_unknown">Erreur inconnue.</string>
+</resources>

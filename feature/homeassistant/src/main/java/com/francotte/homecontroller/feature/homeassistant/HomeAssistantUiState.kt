@@ -1,5 +1,6 @@
 package com.francotte.homecontroller.feature.homeassistant
 
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import com.francotte.homecontroller.core.model.HomeAssistantEntity
 
@@ -9,7 +10,7 @@ data class ConfigurationFormState(
     val url: String = "",
     val token: String = "",
     val isTesting: Boolean = false,
-    val error: String? = null
+    @param:StringRes val error: Int? = null
 )
 
 /**
@@ -41,7 +42,7 @@ sealed interface EntitiesUiState {
     data class Content(
         val items: List<HomeAssistantEntity>,
         val isRefreshing: Boolean = false,
-        val listError: String? = null,
-        val transientError: String? = null
+        @param:StringRes val listError: Int? = null,
+        @param:StringRes val transientError: Int? = null
     ) : EntitiesUiState
 }
